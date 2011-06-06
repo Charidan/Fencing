@@ -35,4 +35,15 @@ public class Deck
     }
     
     public Card getCard(int index) { return cards.get(index); }
+    
+    public String toString()
+    {
+	String out = "";
+	for(Card c: cards)
+	{
+	    out += c.toString();
+	    out += ",";
+	}
+	return out.substring(0, out.length()-2);
+    }
 }
