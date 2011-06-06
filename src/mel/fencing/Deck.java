@@ -19,6 +19,9 @@ public class Deck
         shuffle();
     }
 
+    /**
+     * Shuffles the cards.
+     */
     public void shuffle()
     {
         int size = cards.size();
