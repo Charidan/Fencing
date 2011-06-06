@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">Hello World, Fencing!</string>
     <string name="app_name">Fencing</string>
+    <string name="newGame">New Game</string>
+    <string name="help">Help</string>
+    <string name="conServer">Connect...</string>
 </resources>
