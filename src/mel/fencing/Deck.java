@@ -1,6 +1,7 @@
 package mel.fencing;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Deck
 {
@@ -35,4 +36,16 @@ public class Deck
     }
     
     public Card getCard(int index) { return cards.get(index); }
+    
+    public String toString()
+    {
+	StringBuilder out = new StringBuilder(49);
+	Iterator<Card> i = cards.iterator();
+	out.append(i.next().toString());
+	while(i.hasNext())
+	{
+	    out.append(",").append(i.next().toString());
+	}
+	return out.toString();
+    }
 }
