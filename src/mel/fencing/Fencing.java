@@ -22,6 +22,7 @@ public class Fencing extends Activity
     Socket socket;
     private BufferedReader in;
     private PrintStream out;
+    private boolean connected = false;
     
     /** Called when the activity is first created. */
     @Override
@@ -64,13 +65,15 @@ public class Fencing extends Activity
     
     private void connect()
     {
+        if(connected) disconnect();
+        //TODO show dialog to get host, port, username, password
         try
         {
-            //TODO put a real host in at some point
             socket = new Socket("localhost", PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
             footer.setText("Connection Successful!");
+            while(loginFailed()) retryPassword();
         }
         catch(IOException e)
         {
@@ -79,6 +82,19 @@ public class Fencing extends Activity
         }
     }
 
+    
+    synchronized private boolean loginFailed()
+    {
+        // TODO get a line from server and check if login good or bad
+        return true;
+    }
+    
+    private void retryPassword()
+    {
+        // TODO show a dialog to get new user/password
+        // TODO seed with old username
+    }
+    
     private void newGame()
     {
 	footer.setText("Hoy, look, a New Game!");
@@ -89,5 +105,22 @@ public class Fencing extends Activity
     public void showHelp()
     {
 	footer.setText("If you have to ask, you don't already know.");
+    }
+    
+    synchronized private void disconnect()
+    {
+        try
+        {
+            out.close();
+            in.close();
+            socket.close();
+        }
+        catch (IOException e)
+        {
+            // ignore
+        }
+        socket = null;
+        in = null;
+        out = null;
     }
 }
