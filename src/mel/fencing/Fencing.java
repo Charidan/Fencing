@@ -6,10 +6,14 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 public class Fencing extends Activity
@@ -23,6 +27,12 @@ public class Fencing extends Activity
     private BufferedReader in;
     private PrintStream out;
     private boolean connected = false;
+    AlertDialog connectDialog;
+    int port = PORT;
+    String host = "localhost";
+    String username = "<empty>";
+    String password = "<empty>";
+    boolean abort = false;
     
     /** Called when the activity is first created. */
     @Override
@@ -33,6 +43,7 @@ public class Fencing extends Activity
         header = (TextView) findViewById( R.id.header );
         header.setText(deck.toString());
         footer = (TextView) findViewById( R.id.footer );
+        createConnectDialog();
     }
     
     @Override
@@ -73,7 +84,7 @@ public class Fencing extends Activity
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
             footer.setText("Connection Successful!");
-            while(loginFailed()) retryPassword();
+            if(!abort) while(loginFailed()) retryPassword();
         }
         catch(IOException e)
         {
@@ -97,14 +108,14 @@ public class Fencing extends Activity
     
     private void newGame()
     {
-	footer.setText("Hoy, look, a New Game!");
-	deck.shuffle();
-	header.setText(deck.toString());
+        footer.setText("Hoy, look, a New Game!");
+        deck.shuffle();
+        header.setText(deck.toString());
     }
     
     public void showHelp()
     {
-	footer.setText("If you have to ask, you don't already know.");
+        footer.setText("If you have to ask, you don't already know.");
     }
     
     synchronized private void disconnect()
@@ -122,5 +133,36 @@ public class Fencing extends Activity
         socket = null;
         in = null;
         out = null;
+    }
+    
+    private void createConnectDialog()
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View connectDialogView = factory.inflate(R.layout.ConnectDialog, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setTitle("login").
+             setCancelable(false).
+             setView(connectDialogView).
+             setPositiveButton("Connect", 
+                 new DialogInterface.OnClickListener()
+                 {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which)
+                     {
+                         //TODO load connect info 
+                     } 
+                 }
+             ).
+             setNegativeButton("Cancel",
+                 new DialogInterface.OnClickListener()
+                 {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        abort = true;    
+                    }
+                }
+            );
+        connectDialog = b.create();
     }
 }
