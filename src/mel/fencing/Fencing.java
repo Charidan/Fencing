@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class Fencing extends Activity
@@ -26,6 +27,9 @@ public class Fencing extends Activity
     Deck deck = new Deck();
     TextView header;
     TextView footer;
+    EditText usernameTV = null;
+    EditText passwordTV;
+    EditText hostTV;
     Socket socket;
     private BufferedReader in;
     private PrintStream out;
@@ -85,13 +89,19 @@ public class Fencing extends Activity
     
     private void connect()
     {
+        if(usernameTV == null)
+        {
+            usernameTV = (EditText) connectDialog.findViewById(R.id.username);
+            passwordTV = (EditText) connectDialog.findViewById(R.id.password);
+            hostTV = (EditText) connectDialog.findViewById(R.id.host);
+        }
         try
         {
-            socket = new Socket("localhost", PORT);
+            socket = new Socket(hostTV.getText().toString(), PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
             footer.setText("Connection Successful!");
-            if(!abort) while(loginFailed()) retryPassword();
+            //if(!abort) while(loginFailed()) retryPassword();
         }
         catch(IOException e)
         {
@@ -102,7 +112,7 @@ public class Fencing extends Activity
 
     
     synchronized private boolean loginFailed()
-    {
+    {//OMG A COMMENT
         // TODO get a line from server and check if login good or bad
         return true;
     }
