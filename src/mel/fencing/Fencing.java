@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 public class Fencing extends Activity
 {
     public static final int PORT = 9738;
+
+    public static final int CONNECT_DIALOG = 0;
     
     Deck deck = new Deck();
     TextView header;
@@ -43,7 +46,6 @@ public class Fencing extends Activity
         header = (TextView) findViewById( R.id.header );
         header.setText(deck.toString());
         footer = (TextView) findViewById( R.id.footer );
-        createConnectDialog();
     }
     
     @Override
@@ -64,7 +66,7 @@ public class Fencing extends Activity
                 newGame();
                 return true;
             case R.id.conServer:
-                connect();
+                tryConnect();
                 return true;
             case R.id.help:
                 showHelp();
@@ -74,10 +76,15 @@ public class Fencing extends Activity
         }
     }
     
-    private void connect()
+    private void tryConnect()
     {
         if(connected) disconnect();
-        //TODO show dialog to get host, port, username, password
+        showDialog(CONNECT_DIALOG);
+        
+    }
+    
+    private void connect()
+    {
         try
         {
             socket = new Socket("localhost", PORT);
@@ -135,25 +142,37 @@ public class Fencing extends Activity
         out = null;
     }
     
-    private void createConnectDialog()
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        switch(id)
+        {
+            case CONNECT_DIALOG:
+                return createConnectDialog();
+            default: return null;
+        }
+    }
+    
+    private Dialog createConnectDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
-        View connectDialogView = factory.inflate(R.layout.ConnectDialog, null);
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("login").
-             setCancelable(false).
-             setView(connectDialogView).
-             setPositiveButton("Connect", 
+        View connectDialogView = factory.inflate(R.layout.connect_dialog, null);
+        connectDialog = new AlertDialog.Builder(Fencing.this)
+             .setTitle("login")
+             .setCancelable(false)
+             .setView(connectDialogView)
+             .setPositiveButton("Connect", 
                  new DialogInterface.OnClickListener()
                  {
                      @Override
                      public void onClick(DialogInterface dialog, int which)
                      {
-                         //TODO load connect info 
+                         //TODO load connect info
+                         connect();
                      } 
                  }
-             ).
-             setNegativeButton("Cancel",
+             )
+             .setNegativeButton("Cancel",
                  new DialogInterface.OnClickListener()
                  {
                     @Override
@@ -162,7 +181,8 @@ public class Fencing extends Activity
                         abort = true;    
                     }
                 }
-            );
-        connectDialog = b.create();
+            )
+            .create();
+        return connectDialog;
     }
 }
