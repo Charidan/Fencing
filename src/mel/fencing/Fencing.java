@@ -100,21 +100,34 @@ public class Fencing extends Activity
             socket = new Socket(hostTV.getText().toString(), PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
-            footer.setText("Connection Successful!");
-            //if(!abort) while(loginFailed()) retryPassword();
+            header.setText("Connection Successful!");
+            while(!abort && loginFailed()) retryPassword();
         }
         catch(IOException e)
         {
             header.setText("Connection Failed.");
             footer.setText(e.getMessage());
         }
+        if(abort) disconnect();
     }
 
     
     synchronized private boolean loginFailed()
-    {//OMG A COMMENT
+    {
         // TODO get a line from server and check if login good or bad
-        return true;
+        out.append("L"+usernameTV.getText()+":"+passwordTV.getText());
+        out.flush();
+        try
+        {
+            String s = in.readLine();
+            footer.setText(s);
+        }
+        catch (IOException e)
+        {
+            System.err.println(e.getMessage());
+            return true;
+        }
+        return false;
     }
     
     private void retryPassword()
