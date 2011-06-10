@@ -114,26 +114,36 @@ public class Fencing extends Activity
     
     synchronized private boolean loginFailed()
     {
-        // TODO get a line from server and check if login good or bad
-        out.append("L"+usernameTV.getText()+":"+passwordTV.getText());
+        out.println(usernameTV.getText());
+        out.println(passwordTV.getText());
         out.flush();
+        String s;
         try
         {
-            String s = in.readLine();
-            footer.setText(s);
+            // TODO check if login good or bad
+            s = in.readLine();
         }
         catch (IOException e)
         {
-            System.err.println(e.getMessage());
+            footer.setText(e.getMessage());
             return true;
         }
-        return false;
+        if(s.startsWith("L"))
+        {
+            footer.setText(s.substring(1)+" has logged in successfully.");
+            return false;
+        } else
+        {
+            footer.setText("Login failed with name \""+s.substring(1)+"\"");
+            return true;
+        }
     }
     
     private void retryPassword()
     {
         // TODO show a dialog to get new user/password
         // TODO seed with old username
+        
     }
     
     private void newGame()
