@@ -23,25 +23,31 @@ public class Fencing extends Activity
     public static final int PORT = 9738;
 
     public static final int CONNECT_DIALOG = 0;
-    public static final int RETRY_PASSWORD_DIALOG = 1;
+    public static final int RETRY_LOGIN_DIALOG = 1;
     
     Deck deck = new Deck();
     TextView header;
     TextView footer;
-    EditText usernameTV = null;
-    EditText passwordTV;
-    EditText hostTV;
+    EditText usernameET = null;
+    EditText passwordET;
+    EditText retryUserNameET;
+    EditText retryPasswordET;
+    EditText hostET;
     Socket socket;
-    private BufferedReader in;
-    private PrintStream out;
-    private boolean connected = false;
     AlertDialog connectDialog;
     AlertDialog retryLoginDialog;
-    int port = PORT;
+    
+    private BufferedReader in;
+    private PrintStream out;
+    
+    
+    
     String host = "localhost";
     String username = "<empty>";
     String password = "<empty>";
-    boolean loggedIn = false;
+    private boolean connected = false;
+    private boolean loggedIn = false;
+    private boolean tryingLogin = false;
     
     /** Called when the activity is first created. */
     @Override
@@ -85,24 +91,17 @@ public class Fencing extends Activity
     private void tryConnect()
     {
         if(connected) disconnect();
-        showDialog(CONNECT_DIALOG);
-        
+        showDialog(CONNECT_DIALOG);        
     }
     
     private void connect()
     {
-        if(usernameTV == null)
-        {
-            usernameTV = (EditText) connectDialog.findViewById(R.id.username);
-            passwordTV = (EditText) connectDialog.findViewById(R.id.password);
-            hostTV = (EditText) connectDialog.findViewById(R.id.host);
-        }
         try
-        {
-            
-            socket = new Socket(hostTV.getText().toString(), PORT);
+        {            
+            socket = new Socket(hostET.getText().toString(), PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
+            connected = true;
             header.setText("Connection Successful!");
         }
         catch(IOException e)
@@ -112,9 +111,8 @@ public class Fencing extends Activity
         }
         if(loggedIn) disconnect();
     }
-
     
-    synchronized private boolean loginFailed()
+    synchronized private boolean tryLogin()
     {
         out.println(username);
         out.println(password);
@@ -128,24 +126,18 @@ public class Fencing extends Activity
         catch (IOException e)
         {
             footer.setText(e.getMessage());
-            return true;
+            disconnect();
+            return false;
         }
         if(s.startsWith("L"))
         {
             footer.setText(s.substring(1)+" has logged in successfully.");
-            return false;
+            return true;
         } else
         {
             footer.setText("Login failed with name \""+s.substring(1)+"\"");
-            return true;
+            return false;
         }
-    }
-    
-    private void retryPassword()
-    {
-        // TODO show a dialog to get new user/password
-        // TODO seed with old username
-        showDialog(RETRY_PASSWORD_DIALOG);
     }
     
     private void newGame()
@@ -162,6 +154,7 @@ public class Fencing extends Activity
     
     synchronized private void disconnect()
     {
+        connected = false;
         try
         {
             out.close();
@@ -184,10 +177,34 @@ public class Fencing extends Activity
         {
             case CONNECT_DIALOG:
                 return createConnectDialog();
-            case RETRY_PASSWORD_DIALOG:
+            case RETRY_LOGIN_DIALOG:
                 return createRetryLoginDialog();
             default: return null;
+            
         }
+    }
+    
+    @Override 
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+        
+        if(connected && !loggedIn && !tryingLogin) 
+        {
+            tryingLogin = true;
+            showDialog(RETRY_LOGIN_DIALOG);
+            initRetryLoginDialogHandles();
+            retryUserNameET.setText(username);
+            retryPasswordET.setText("");
+        }
+    }
+    
+    private void initConnectDialogHandles()
+    {
+        if(usernameET != null) return;
+        usernameET = (EditText) connectDialog.findViewById(R.id.username);
+        passwordET = (EditText) connectDialog.findViewById(R.id.password);
+        hostET = (EditText) connectDialog.findViewById(R.id.host);
     }
     
     private Dialog createConnectDialog()
@@ -204,11 +221,11 @@ public class Fencing extends Activity
                      @Override
                      public void onClick(DialogInterface dialog, int which)
                      {
-                         //TODO load connect info
-                         loggedIn = false;
+                         initConnectDialogHandles();
                          connect();
-                         username = usernameTV.getText().toString();
-                         password = passwordTV.getText().toString();
+                         username = usernameET.getText().toString();
+                         password = passwordET.getText().toString();
+                         loggedIn = tryLogin();
                      } 
                  }
              )
@@ -226,32 +243,42 @@ public class Fencing extends Activity
         return connectDialog;
     }
     
+    private void initRetryLoginDialogHandles()
+    {
+        if(retryUserNameET != null) return;
+        retryUserNameET = (EditText) retryLoginDialog.findViewById(R.id.retry_username);
+        retryPasswordET = (EditText) retryLoginDialog.findViewById(R.id.retry_password);
+    }
+    
     private Dialog createRetryLoginDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
-        View connectDialogView = factory.inflate(R.layout.retry_login_dialog, null);
+        View connectDialogView = factory.inflate(R.layout.retry_login_dialog, null); 
         retryLoginDialog = new AlertDialog.Builder(Fencing.this)
              .setTitle("retry login")
              .setCancelable(false)
              .setView(connectDialogView)
-             .setPositiveButton("Connect", 
+             .setPositiveButton("Login", 
                  new DialogInterface.OnClickListener()
                  {
                      @Override
                      public void onClick(DialogInterface dialog, int which)
                      {
-                         username = usernameTV.getText().toString();
-                         password = passwordTV.getText().toString();
+                         tryingLogin = false;
+                         initRetryLoginDialogHandles();
+                         username = retryUserNameET.getText().toString();
+                         password = retryPasswordET.getText().toString();
+                         loggedIn = tryLogin();
                      } 
                  }
              )
-             .setNegativeButton("Cancel",
+             .setNegativeButton("Disconnect",
                  new DialogInterface.OnClickListener()
                  {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
-                    {
-                        loggedIn = true;    
+                    {   
+                        tryingLogin = false;
                         retryLoginDialog.dismiss();
                     }
                 }
