@@ -23,6 +23,7 @@ public class Fencing extends Activity
     public static final int PORT = 9738;
 
     public static final int CONNECT_DIALOG = 0;
+    public static final int RETRY_PASSWORD_DIALOG = 1;
     
     Deck deck = new Deck();
     TextView header;
@@ -35,11 +36,12 @@ public class Fencing extends Activity
     private PrintStream out;
     private boolean connected = false;
     AlertDialog connectDialog;
+    AlertDialog retryLoginDialog;
     int port = PORT;
     String host = "localhost";
     String username = "<empty>";
     String password = "<empty>";
-    boolean abort = false;
+    boolean loggedIn = false;
     
     /** Called when the activity is first created. */
     @Override
@@ -97,25 +99,25 @@ public class Fencing extends Activity
         }
         try
         {
+            
             socket = new Socket(hostTV.getText().toString(), PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
             header.setText("Connection Successful!");
-            while(!abort && loginFailed()) retryPassword();
         }
         catch(IOException e)
         {
             header.setText("Connection Failed.");
             footer.setText(e.getMessage());
         }
-        if(abort) disconnect();
+        if(loggedIn) disconnect();
     }
 
     
     synchronized private boolean loginFailed()
     {
-        out.println(usernameTV.getText());
-        out.println(passwordTV.getText());
+        out.println(username);
+        out.println(password);
         out.flush();
         String s;
         try
@@ -143,7 +145,7 @@ public class Fencing extends Activity
     {
         // TODO show a dialog to get new user/password
         // TODO seed with old username
-        
+        showDialog(RETRY_PASSWORD_DIALOG);
     }
     
     private void newGame()
@@ -182,6 +184,8 @@ public class Fencing extends Activity
         {
             case CONNECT_DIALOG:
                 return createConnectDialog();
+            case RETRY_PASSWORD_DIALOG:
+                return createRetryLoginDialog();
             default: return null;
         }
     }
@@ -201,7 +205,10 @@ public class Fencing extends Activity
                      public void onClick(DialogInterface dialog, int which)
                      {
                          //TODO load connect info
+                         loggedIn = false;
                          connect();
+                         username = usernameTV.getText().toString();
+                         password = passwordTV.getText().toString();
                      } 
                  }
              )
@@ -211,11 +218,45 @@ public class Fencing extends Activity
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        abort = true;    
+                        connectDialog.dismiss();  
                     }
                 }
             )
             .create();
         return connectDialog;
+    }
+    
+    private Dialog createRetryLoginDialog()
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View connectDialogView = factory.inflate(R.layout.retry_login_dialog, null);
+        retryLoginDialog = new AlertDialog.Builder(Fencing.this)
+             .setTitle("retry login")
+             .setCancelable(false)
+             .setView(connectDialogView)
+             .setPositiveButton("Connect", 
+                 new DialogInterface.OnClickListener()
+                 {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which)
+                     {
+                         username = usernameTV.getText().toString();
+                         password = passwordTV.getText().toString();
+                     } 
+                 }
+             )
+             .setNegativeButton("Cancel",
+                 new DialogInterface.OnClickListener()
+                 {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        loggedIn = true;    
+                        retryLoginDialog.dismiss();
+                    }
+                }
+            )
+            .create();
+        return retryLoginDialog;
     }
 }
