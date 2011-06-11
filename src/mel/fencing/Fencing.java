@@ -168,6 +168,8 @@ public class Fencing extends Activity
         socket = null;
         in = null;
         out = null;
+        footer.setText("");
+        header.setText("Disconnected");
     }
     
     @Override
@@ -235,7 +237,7 @@ public class Fencing extends Activity
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        connectDialog.dismiss();  
+                        // do nothing  
                     }
                 }
             )
@@ -279,7 +281,7 @@ public class Fencing extends Activity
                     public void onClick(DialogInterface dialog, int which)
                     {   
                         tryingLogin = false;
-                        retryLoginDialog.dismiss();
+                        disconnect();
                     }
                 }
             )
