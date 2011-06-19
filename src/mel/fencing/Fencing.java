@@ -24,11 +24,12 @@ public class Fencing extends Activity
 
     public static final int CONNECT_DIALOG = 0;
     public static final int RETRY_LOGIN_DIALOG = 1;
+    public static final int NEW_GAME_DIALOG = 2;
     
-    Deck deck = new Deck();
     TextView header;
     TextView footer;
     EditText usernameET = null;
+    EditText newGameUsernameET = null;
     EditText passwordET;
     EditText retryUserNameET;
     EditText retryPasswordET;
@@ -36,6 +37,7 @@ public class Fencing extends Activity
     Socket socket;
     AlertDialog connectDialog;
     AlertDialog retryLoginDialog;
+    AlertDialog newGameDialog;
     
     private BufferedReader in;
     private PrintStream out;
@@ -56,7 +58,6 @@ public class Fencing extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         header = (TextView) findViewById( R.id.header );
-        header.setText(deck.toString());
         footer = (TextView) findViewById( R.id.footer );
     }
     
@@ -142,9 +143,18 @@ public class Fencing extends Activity
     
     private void newGame()
     {
-        footer.setText("Hoy, look, a New Game!");
-        deck.shuffle();
-        header.setText(deck.toString());
+        header.setText("New Game requested.");
+        showDialog(NEW_GAME_DIALOG);
+        try
+        {
+            //TODO actually handle new game response
+            String s = in.readLine();
+            header.setText(s);
+        }
+        catch (IOException e)
+        {
+            header.setText("NewGameErr: "+e.getMessage());
+        }
     }
     
     public void showHelp()
@@ -181,11 +191,58 @@ public class Fencing extends Activity
                 return createConnectDialog();
             case RETRY_LOGIN_DIALOG:
                 return createRetryLoginDialog();
+            case NEW_GAME_DIALOG:
+                return createNewGameDialog();
             default: return null;
             
         }
     }
     
+    private Dialog createNewGameDialog()
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View newGameDialogView = factory.inflate(R.layout.new_game_dialog, null);
+        newGameDialog = new AlertDialog.Builder(Fencing.this)
+             .setTitle("new game")
+             .setCancelable(false)
+             .setView(newGameDialogView)
+             .setPositiveButton("Challenge User", 
+                 new DialogInterface.OnClickListener()
+                 {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which)
+                     {
+                         initNewGameDialogHandles();
+                         out.println("NT"+newGameUsernameET.getText());
+                         out.flush();
+                     }
+                 }
+             )
+             .setNeutralButton("Open Challenge",
+                 new DialogInterface.OnClickListener()
+                 {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        out.println("NO");
+                        out.flush();
+                    }
+                }
+            )
+             .setNegativeButton("Cancel",
+                 new DialogInterface.OnClickListener()
+                 {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        // do nothing  
+                    }
+                }
+            )
+            .create();
+        return connectDialog;
+    }
+
     @Override 
     public void onWindowFocusChanged(boolean hasFocus)
     {
@@ -207,6 +264,12 @@ public class Fencing extends Activity
         usernameET = (EditText) connectDialog.findViewById(R.id.username);
         passwordET = (EditText) connectDialog.findViewById(R.id.password);
         hostET = (EditText) connectDialog.findViewById(R.id.host);
+    }
+    
+    private void initNewGameDialogHandles()
+    {
+        if(newGameUsernameET != null) return;
+        newGameUsernameET = (EditText) newGameDialog.findViewById(R.id.new_game_username);
     }
     
     private Dialog createConnectDialog()
