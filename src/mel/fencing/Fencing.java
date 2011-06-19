@@ -193,6 +193,7 @@ public class Fencing extends Activity
                 return createRetryLoginDialog();
             case NEW_GAME_DIALOG:
                 return createNewGameDialog();
+                //return createConnectDialog();
             default: return null;
             
         }
@@ -240,7 +241,7 @@ public class Fencing extends Activity
                 }
             )
             .create();
-        return connectDialog;
+        return newGameDialog;
     }
 
     @Override 
