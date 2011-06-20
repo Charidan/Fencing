@@ -133,6 +133,7 @@ public class Fencing extends Activity
         if(s.startsWith("L"))
         {
             footer.setText(s.substring(1)+" has logged in successfully.");
+            startClientSession();
             return true;
         } else
         {
@@ -141,20 +142,47 @@ public class Fencing extends Activity
         }
     }
     
+    private void startClientSession()
+    {
+        Runnable r = new Runnable()
+        {
+            public void run() 
+            {
+                boolean done = false;
+                while(!done) 
+                {
+                    try
+                    {
+                        done = handleCommand(in.readLine());
+                    } 
+                    catch(IOException ex)
+                    {
+                        done = true;
+                        footer.setText(ex.getMessage());
+                    }
+                }
+                handleDisconnect();
+            }
+        };
+        new Thread(r).start();
+    }
+
+    private void handleDisconnect()
+    {
+        // TODO - help! my server is gone
+        header.setText("Server Connection Lost");
+    }
+    
+    private boolean handleCommand(String command)
+    {
+        // TODO actually handle a server message
+        footer.setText(command);
+        return false;
+    }
+    
     private void newGame()
     {
-        header.setText("New Game requested.");
         showDialog(NEW_GAME_DIALOG);
-        try
-        {
-            //TODO actually handle new game response
-            String s = in.readLine();
-            header.setText(s);
-        }
-        catch (IOException e)
-        {
-            header.setText("NewGameErr: "+e.getMessage());
-        }
     }
     
     public void showHelp()
