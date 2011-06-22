@@ -10,6 +10,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,12 +24,17 @@ public class Fencing extends Activity
 {
     public static final int PORT = 9738;
 
-    public static final int CONNECT_DIALOG = 0;
-    public static final int RETRY_LOGIN_DIALOG = 1;
-    public static final int NEW_GAME_DIALOG = 2;
+    public static final int DIALOG_CONNECT = 0;
+    public static final int DIALOG_RETRY_LOGIN = 1;
+    public static final int DIALOG_NEW_GAME = 2;
+    
+    public static final int MESSAGE_ERROR = 0;
+    public static final int MESSAGE_COMMAND = 1;
     
     TextView header;
     TextView footer;
+    String headerText = "";
+    String footerText = "";
     EditText usernameET = null;
     EditText newGameUsernameET = null;
     EditText passwordET;
@@ -38,6 +45,9 @@ public class Fencing extends Activity
     AlertDialog connectDialog;
     AlertDialog retryLoginDialog;
     AlertDialog newGameDialog;
+    FencingHandler handler;
+    
+    boolean refresh = false;
     
     private BufferedReader in;
     private PrintStream out;
@@ -57,6 +67,7 @@ public class Fencing extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        handler = new FencingHandler();
         header = (TextView) findViewById( R.id.header );
         footer = (TextView) findViewById( R.id.footer );
     }
@@ -92,7 +103,7 @@ public class Fencing extends Activity
     private void tryConnect()
     {
         if(connected) disconnect();
-        showDialog(CONNECT_DIALOG);        
+        showDialog(DIALOG_CONNECT);        
     }
     
     private void connect()
@@ -153,12 +164,16 @@ public class Fencing extends Activity
                 {
                     try
                     {
-                        done = handleCommand(in.readLine());
+                        String s = in.readLine();
+                        if(s.startsWith("Z")) done = true;
+                        Message m = Message.obtain(handler, MESSAGE_COMMAND, s);
+                        handler.sendMessage(m);
                     } 
-                    catch(IOException ex)
+                    catch(Exception ex)
                     {
                         done = true;
-                        footer.setText(ex.getMessage());
+                        Message m = Message.obtain(handler, MESSAGE_ERROR, ex);
+                        handler.sendMessage(m);
                     }
                 }
                 handleDisconnect();
@@ -170,19 +185,11 @@ public class Fencing extends Activity
     private void handleDisconnect()
     {
         // TODO - help! my server is gone
-        header.setText("Server Connection Lost");
-    }
-    
-    private boolean handleCommand(String command)
-    {
-        // TODO actually handle a server message
-        footer.setText(command);
-        return false;
     }
     
     private void newGame()
     {
-        showDialog(NEW_GAME_DIALOG);
+        showDialog(DIALOG_NEW_GAME);
     }
     
     public void showHelp()
@@ -215,11 +222,11 @@ public class Fencing extends Activity
     {
         switch(id)
         {
-            case CONNECT_DIALOG:
+            case DIALOG_CONNECT:
                 return createConnectDialog();
-            case RETRY_LOGIN_DIALOG:
+            case DIALOG_RETRY_LOGIN:
                 return createRetryLoginDialog();
-            case NEW_GAME_DIALOG:
+            case DIALOG_NEW_GAME:
                 return createNewGameDialog();
                 //return createConnectDialog();
             default: return null;
@@ -280,7 +287,7 @@ public class Fencing extends Activity
         if(connected && !loggedIn && !tryingLogin) 
         {
             tryingLogin = true;
-            showDialog(RETRY_LOGIN_DIALOG);
+            showDialog(DIALOG_RETRY_LOGIN);
             initRetryLoginDialogHandles();
             retryUserNameET.setText(username);
             retryPasswordET.setText("");
@@ -379,5 +386,26 @@ public class Fencing extends Activity
             )
             .create();
         return retryLoginDialog;
+    }
+    
+    public class FencingHandler extends Handler
+    {
+        @Override
+        public void handleMessage(Message m)
+        {
+            switch(m.what)
+            {
+                case MESSAGE_ERROR:
+                    header.setText("Exception Received");
+                    Exception ex = (Exception) m.obj;
+                    footer.setText(ex.getMessage());
+                break;
+                case MESSAGE_COMMAND:
+                    header.setText("Command Received");
+                    String s = (String) m.obj;
+                    footer.setText(s);
+                break;
+            }
+        }
     }
 }
