@@ -27,6 +27,7 @@ public class Fencing extends Activity
     public static final int DIALOG_CONNECT = 0;
     public static final int DIALOG_RETRY_LOGIN = 1;
     public static final int DIALOG_NEW_GAME = 2;
+    public static final int DIALOG_WAIT = 3;
     
     public static final int MESSAGE_ERROR = 0;
     public static final int MESSAGE_COMMAND = 1;
@@ -45,10 +46,12 @@ public class Fencing extends Activity
     EditText retryUserNameET;
     EditText retryPasswordET;
     EditText hostET;
+    TextView waitForTV;
     Socket socket;
     AlertDialog connectDialog;
     AlertDialog retryLoginDialog;
     AlertDialog newGameDialog;
+    AlertDialog waitDialog;
     FencingHandler handler;
     int state = STATE_DISCONNECTED;
     
@@ -56,8 +59,6 @@ public class Fencing extends Activity
     
     private BufferedReader in;
     private PrintStream out;
-    
-    
     
     String host = "localhost";
     String username = "<empty>";
@@ -233,7 +234,8 @@ public class Fencing extends Activity
                 return createRetryLoginDialog();
             case DIALOG_NEW_GAME:
                 return createNewGameDialog();
-                //return createConnectDialog();
+            case DIALOG_WAIT:
+                return createWaitDialog();
             default: return null;
             
         }
@@ -316,11 +318,11 @@ public class Fencing extends Activity
     private Dialog createConnectDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
-        View connectDialogView = factory.inflate(R.layout.connect_dialog, null);
+        View view = factory.inflate(R.layout.connect_dialog, null);
         connectDialog = new AlertDialog.Builder(Fencing.this)
              .setTitle("login")
              .setCancelable(false)
-             .setView(connectDialogView)
+             .setView(view)
              .setPositiveButton("Connect", 
                  new DialogInterface.OnClickListener()
                  {
@@ -356,14 +358,42 @@ public class Fencing extends Activity
         retryPasswordET = (EditText) retryLoginDialog.findViewById(R.id.retry_password);
     }
     
+    private void initWaitHandles()
+    {
+        if(waitForTV != null) return;
+        waitForTV = (TextView)waitDialog.findViewById(R.id.waitFor);
+    }
+    private Dialog createWaitDialog()
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View view = factory.inflate(R.layout.retry_login_dialog, null); 
+        Dialog waitDialog = new AlertDialog.Builder(Fencing.this)
+            .setTitle("Awaiting Opponet")
+            .setView(view)
+            .setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener()
+                    {
+                        
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            // TODO send cancel message 
+                            
+                        }
+                    }
+            )
+            .create();
+         return waitDialog;
+    }
+    
     private Dialog createRetryLoginDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
-        View connectDialogView = factory.inflate(R.layout.retry_login_dialog, null); 
+        View view = factory.inflate(R.layout.retry_login_dialog, null); 
         retryLoginDialog = new AlertDialog.Builder(Fencing.this)
-             .setTitle("retry login")
+             .setTitle("Retry Login")
              .setCancelable(false)
-             .setView(connectDialogView)
+             .setView(view)
              .setPositiveButton("Login", 
                  new DialogInterface.OnClickListener()
                  {
