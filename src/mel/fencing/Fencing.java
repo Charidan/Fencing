@@ -363,10 +363,11 @@ public class Fencing extends Activity
         if(waitForTV != null) return;
         waitForTV = (TextView)waitDialog.findViewById(R.id.waitFor);
     }
+    
     private Dialog createWaitDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
-        View view = factory.inflate(R.layout.retry_login_dialog, null); 
+        View view = factory.inflate(R.layout.wait_dialog, null); 
         Dialog waitDialog = new AlertDialog.Builder(Fencing.this)
             .setTitle("Awaiting Opponet")
             .setView(view)
