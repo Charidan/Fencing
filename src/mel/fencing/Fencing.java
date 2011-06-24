@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.HashMap;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -66,6 +67,19 @@ public class Fencing extends Activity
     private boolean connected = false;
     private boolean loggedIn = false;
     private boolean tryingLogin = false;
+    
+    private HashMap<Character,Command> opcode2Command = new HashMap<Character,Command>();
+    
+    public Fencing()
+    {
+        super();
+        registerCommand('E', new ErrorCommand());
+    }
+    
+    private void registerCommand(Character opcode, Command command)
+    {
+        opcode2Command.put(opcode, command);
+    }
     
     /** Called when the activity is first created. */
     @Override
@@ -439,9 +453,26 @@ public class Fencing extends Activity
                 case MESSAGE_COMMAND:
                     header.setText("Command Received");
                     String s = (String) m.obj;
-                    footer.setText(s);
+                    if(s == null || s.length()<1) return; // ignore empty messages
+                    Command c = opcode2Command.get(s.charAt(0));
+                    if(c == null)
+                    {
+                        header.setText("Unknown Sever Command");
+                        footer.setText(s);
+                    }
+                    else c.execute(s.substring(1));
                 break;
             }
+        }
+    }
+    
+    private class ErrorCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            header.setText("Server Error");
+            footer.setText("Error: "+in);
         }
     }
 }
