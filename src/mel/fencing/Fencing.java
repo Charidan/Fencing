@@ -270,8 +270,7 @@ public class Fencing extends Activity
                      public void onClick(DialogInterface dialog, int which)
                      {
                          initNewGameDialogHandles();
-                         out.println("NT"+newGameUsernameET.getText());
-                         out.flush();
+                         send("NT"+newGameUsernameET.getText());
                      }
                  }
              )
@@ -281,8 +280,7 @@ public class Fencing extends Activity
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        out.println("NO");
-                        out.flush();
+                        send("NO");
                     }
                 }
             )
@@ -392,8 +390,7 @@ public class Fencing extends Activity
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            // TODO send cancel message 
-                            
+                            send("C");
                         }
                     }
             )
@@ -436,6 +433,12 @@ public class Fencing extends Activity
             )
             .create();
         return retryLoginDialog;
+    }
+    
+    public void send(String what)
+    {
+        out.println(what);
+        out.flush();
     }
     
     public class FencingHandler extends Handler
