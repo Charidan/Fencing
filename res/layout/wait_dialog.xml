@@ -4,15 +4,12 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 >
-
-	<ProgressBar
-		android:indeterminate="true"
-	/>
 	
 	<TextView 
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
-		android:id="@+id/waitFor"
+		android:id="@+id/wait_for"
 		android:text="Waiting for opponent"
 	/>
+	
 </LinearLayout>
