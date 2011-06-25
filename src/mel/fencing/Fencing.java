@@ -152,7 +152,6 @@ public class Fencing extends Activity
         String s;
         try
         {
-            // TODO check if login good or bad
             s = in.readLine();
         }
         catch (IOException e)
