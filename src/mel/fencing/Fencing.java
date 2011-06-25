@@ -61,9 +61,8 @@ public class Fencing extends Activity
     private BufferedReader in;
     private PrintStream out;
     
-    String host = "localhost";
-    String username = "<empty>";
-    String password = "<empty>";
+    private String username = "<empty>";
+    private String password = "<empty>";
     private boolean connected = false;
     private boolean loggedIn = false;
     private boolean tryingLogin = false;
@@ -221,6 +220,7 @@ public class Fencing extends Activity
     synchronized private void disconnect()
     {
         connected = false;
+        state = STATE_DISCONNECTED;
         try
         {
             out.close();
@@ -376,14 +376,14 @@ public class Fencing extends Activity
     private void initWaitHandles()
     {
         if(waitForTV != null) return;
-        waitForTV = (TextView)waitDialog.findViewById(R.id.waitFor);
+        waitForTV = (TextView)waitDialog.findViewById(R.id.wait_for);
     }
     
     private Dialog createWaitDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
         View view = factory.inflate(R.layout.wait_dialog, null); 
-        Dialog waitDialog = new AlertDialog.Builder(Fencing.this)
+        waitDialog = new AlertDialog.Builder(Fencing.this)
             .setTitle("Awaiting Opponet")
             .setView(view)
             .setNegativeButton("Cancel",
