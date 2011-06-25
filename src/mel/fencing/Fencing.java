@@ -74,6 +74,7 @@ public class Fencing extends Activity
     {
         super();
         registerCommand('E', new ErrorCommand());
+        registerCommand('W', new WaitCommand());
     }
     
     private void registerCommand(Character opcode, Command command)
@@ -473,6 +474,17 @@ public class Fencing extends Activity
         {
             header.setText("Server Error");
             footer.setText("Error: "+in);
+        }
+    }
+    
+    private class WaitCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            showDialog(DIALOG_WAIT);
+            initWaitHandles();
+            waitForTV.setText("Waiting for "+in);
         }
     }
 }
