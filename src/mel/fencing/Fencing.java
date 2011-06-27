@@ -554,6 +554,7 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             waitDialog.dismiss();
+            footer.setText("Challenge Rejected.");
         }
     }
     
@@ -563,6 +564,7 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             challengedDialog.dismiss();
+            footer.setText("Challenge Withdrawn.");
         }
     }
 }
