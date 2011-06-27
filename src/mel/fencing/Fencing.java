@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,6 +31,7 @@ public class Fencing extends Activity
     public static final int DIALOG_RETRY_LOGIN = 1;
     public static final int DIALOG_NEW_GAME = 2;
     public static final int DIALOG_WAIT = 3;
+    public static final int DIALOG_CHALLENGED = 4;
     
     public static final int MESSAGE_ERROR = 0;
     public static final int MESSAGE_COMMAND = 1;
@@ -48,11 +51,13 @@ public class Fencing extends Activity
     EditText retryPasswordET;
     EditText hostET;
     TextView waitForTV;
+    TextView challengedTV;
     Socket socket;
     AlertDialog connectDialog;
     AlertDialog retryLoginDialog;
     AlertDialog newGameDialog;
     AlertDialog waitDialog;
+    AlertDialog challengedDialog;
     FencingHandler handler;
     int state = STATE_DISCONNECTED;
     
@@ -74,6 +79,9 @@ public class Fencing extends Activity
         super();
         registerCommand('E', new ErrorCommand());
         registerCommand('W', new WaitCommand());
+        registerCommand('T', new RecieveChallengeCommand());
+        registerCommand('c', new RejectedCommand());
+        registerCommand('C', new WithdrawnCommand());
     }
     
     private void registerCommand(Character opcode, Command command)
@@ -250,8 +258,9 @@ public class Fencing extends Activity
                 return createNewGameDialog();
             case DIALOG_WAIT:
                 return createWaitDialog();
+            case DIALOG_CHALLENGED:
+                return createChallengedDialog();
             default: return null;
-            
         }
     }
     
@@ -298,6 +307,38 @@ public class Fencing extends Activity
         return newGameDialog;
     }
 
+    private Dialog createChallengedDialog()
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        View challengedDialogView = factory.inflate(R.layout.challenged_dialog, null);
+        challengedDialog = new AlertDialog.Builder(Fencing.this)
+             .setTitle("Challenge Recieved")
+             .setCancelable(false)
+             .setView(challengedDialogView)
+             .setPositiveButton("Accept", 
+                 new DialogInterface.OnClickListener()
+                 {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which)
+                     {
+                         send("A");
+                     }
+                 }
+             )
+             .setNegativeButton("Reject",
+                 new DialogInterface.OnClickListener()
+                 {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        send("R"); 
+                    }
+                }
+            )
+            .create();
+        return challengedDialog;
+    }
+    
     @Override 
     public void onWindowFocusChanged(boolean hasFocus)
     {
@@ -374,6 +415,12 @@ public class Fencing extends Activity
     {
         if(waitForTV != null) return;
         waitForTV = (TextView)waitDialog.findViewById(R.id.wait_for);
+    }
+    
+    private void initChallengedHandles()
+    {
+        if(challengedTV != null) return;
+        challengedTV = (TextView) challengedDialog.findViewById(R.id.challenged_by);
     }
     
     private Dialog createWaitDialog()
@@ -487,6 +534,35 @@ public class Fencing extends Activity
             showDialog(DIALOG_WAIT);
             initWaitHandles();
             waitForTV.setText("Waiting for "+in);
+        }
+    }
+    
+    private class RecieveChallengeCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            showDialog(DIALOG_CHALLENGED);
+            initChallengedHandles();
+            challengedTV.setText("Challenged by "+in);
+        }
+    }
+    
+    private class RejectedCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            waitDialog.dismiss();
+        }
+    }
+    
+    private class WithdrawnCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            challengedDialog.dismiss();
         }
     }
 }
