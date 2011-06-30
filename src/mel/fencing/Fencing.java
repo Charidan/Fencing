@@ -69,6 +69,7 @@ public class Fencing extends Activity
     private boolean connected = false;
     private boolean loggedIn = false;
     private boolean tryingLogin = false;
+    private boolean killed = false;
     
     private HashMap<Character,Command> opcode2Command = new HashMap<Character,Command>();
     
@@ -80,6 +81,7 @@ public class Fencing extends Activity
         registerCommand('T', new RecieveChallengeCommand());
         registerCommand('c', new RejectedCommand());
         registerCommand('C', new WithdrawnCommand());
+        registerCommand('K', new KillCommand());
     }
     
     private void registerCommand(Character opcode, Command command)
@@ -144,7 +146,7 @@ public class Fencing extends Activity
         }
         catch(IOException e)
         {
-            header.setText("Connection Failed.");
+            header.setText("Connection Failed");
             footer.setText(e.getMessage());
         }
         if(loggedIn) disconnect();
@@ -168,7 +170,7 @@ public class Fencing extends Activity
         }
         if(s.startsWith("L"))
         {
-            footer.setText(s.substring(1)+" has logged in successfully.");
+            footer.setText(s.substring(1)+" has logged in successfully");
             startClientSession();
             return true;
         } else
@@ -209,7 +211,19 @@ public class Fencing extends Activity
 
     private void handleDisconnect()
     {
-        // TODO - help! my server is gone
+        header.setText("Disconnected from server");
+        if(killed)
+        {
+            footer.setText("You were logged out due to duplicate log in");
+            killed = false;
+        }
+        connected = false;
+        loggedIn = false;
+        tryingLogin = false;
+        state = STATE_DISCONNECTED;
+        socket = null;
+        in = null;
+        out = null;
     }
     
     private void newGame()
@@ -219,17 +233,17 @@ public class Fencing extends Activity
     
     public void showHelp()
     {
-        footer.setText("If you have to ask, you don't already know.");
+        footer.setText("If you have to ask, you don't already know");
     }
     
     synchronized private void disconnect()
     {
         connected = false;
+        loggedIn = false;
+        tryingLogin = false;
         state = STATE_DISCONNECTED;
         try
         {
-            out.close();
-            in.close();
             socket.close();
         }
         catch (IOException e)
@@ -267,7 +281,7 @@ public class Fencing extends Activity
         LayoutInflater factory = LayoutInflater.from(this);
         View newGameDialogView = factory.inflate(R.layout.new_game_dialog, null);
         newGameDialog = new AlertDialog.Builder(Fencing.this)
-             .setTitle("new game")
+             .setTitle("New Game")
              .setCancelable(false)
              .setView(newGameDialogView)
              .setPositiveButton("Challenge User", 
@@ -371,7 +385,7 @@ public class Fencing extends Activity
         LayoutInflater factory = LayoutInflater.from(this);
         View view = factory.inflate(R.layout.connect_dialog, null);
         connectDialog = new AlertDialog.Builder(Fencing.this)
-             .setTitle("login")
+             .setTitle("Login")
              .setCancelable(false)
              .setView(view)
              .setPositiveButton("Connect", 
@@ -426,7 +440,7 @@ public class Fencing extends Activity
         LayoutInflater factory = LayoutInflater.from(this);
         View view = factory.inflate(R.layout.wait_dialog, null); 
         waitDialog = new AlertDialog.Builder(Fencing.this)
-            .setTitle("Awaiting Opponet")
+            .setTitle("Awaiting Opponent")
             .setView(view)
             .setNegativeButton("Cancel",
                     new DialogInterface.OnClickListener()
@@ -552,7 +566,7 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             waitDialog.dismiss();
-            footer.setText("Challenge Rejected.");
+            footer.setText("Challenge Rejected");
         }
     }
     
@@ -562,7 +576,16 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             challengedDialog.dismiss();
-            footer.setText("Challenge Withdrawn.");
+            footer.setText("Challenge Withdrawn");
+        }
+    }
+    
+    private class KillCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            killed = true;
         }
     }
 }
