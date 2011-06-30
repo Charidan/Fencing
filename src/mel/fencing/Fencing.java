@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -372,6 +373,15 @@ public class Fencing extends Activity
         usernameET = (EditText) connectDialog.findViewById(R.id.username);
         passwordET = (EditText) connectDialog.findViewById(R.id.password);
         hostET = (EditText) connectDialog.findViewById(R.id.host);
+        hostET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                    KeyEvent event)
+            {
+                connectDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                return true;
+            }
+        });
     }
     
     private void initNewGameDialogHandles()
