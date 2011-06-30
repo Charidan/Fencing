@@ -204,27 +204,10 @@ public class Fencing extends Activity
                         handler.sendMessage(m);
                     }
                 }
-                handleDisconnect();
+                disconnect();
             }
         };
         new Thread(r).start();
-    }
-
-    private void handleDisconnect()
-    {
-        header.setText("Disconnected from server");
-        if(killed)
-        {
-            footer.setText("You were logged out due to duplicate log in");
-            killed = false;
-        }
-        connected = false;
-        loggedIn = false;
-        tryingLogin = false;
-        state = STATE_DISCONNECTED;
-        socket = null;
-        in = null;
-        out = null;
     }
     
     private void newGame()
@@ -244,15 +227,20 @@ public class Fencing extends Activity
     
     synchronized private void disconnect()
     {
+        if(killed)
+        {
+            footer.setText("You were logged out due to duplicate log in");
+            killed = false;
+        }
         connected = false;
         loggedIn = false;
         tryingLogin = false;
         state = STATE_DISCONNECTED;
         try
         {
-            socket.close();
+            if(socket != null) socket.close();
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             // ignore
         }
@@ -282,6 +270,30 @@ public class Fencing extends Activity
         }
     }
     
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog)
+    {
+        super.onPrepareDialog(id, dialog);
+        switch(id)
+        {
+            case DIALOG_CONNECT:
+                initConnectDialogHandles();
+            break;
+            case DIALOG_RETRY_LOGIN:
+                initRetryLoginDialogHandles();
+            break;
+            case DIALOG_NEW_GAME:
+                initNewGameDialogHandles();
+            break;
+            case DIALOG_WAIT:
+                initWaitHandles();
+            break;
+            case DIALOG_CHALLENGED:
+                initChallengedHandles();
+            break;
+        }
+    }
+    
     private Dialog createNewGameDialog()
     {
         LayoutInflater factory = LayoutInflater.from(this);
@@ -296,7 +308,6 @@ public class Fencing extends Activity
                      @Override
                      public void onClick(DialogInterface dialog, int which)
                      {
-                         initNewGameDialogHandles();
                          send("NT"+newGameUsernameET.getText());
                      }
                  }
@@ -366,7 +377,6 @@ public class Fencing extends Activity
         {
             tryingLogin = true;
             showDialog(DIALOG_RETRY_LOGIN);
-            initRetryLoginDialogHandles();
             retryUserNameET.setText(username);
             retryPasswordET.setText("");
         }
@@ -378,7 +388,7 @@ public class Fencing extends Activity
         usernameET = (EditText) connectDialog.findViewById(R.id.username);
         passwordET = (EditText) connectDialog.findViewById(R.id.password);
         hostET = (EditText) connectDialog.findViewById(R.id.host);
-        hostET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        hostET.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId,
                     KeyEvent event)
@@ -409,7 +419,6 @@ public class Fencing extends Activity
                      @Override
                      public void onClick(DialogInterface dialog, int which)
                      {
-                         initConnectDialogHandles();
                          connect();
                          username = usernameET.getText().toString();
                          password = passwordET.getText().toString();
@@ -487,7 +496,6 @@ public class Fencing extends Activity
                      public void onClick(DialogInterface dialog, int which)
                      {
                          tryingLogin = false;
-                         initRetryLoginDialogHandles();
                          username = retryUserNameET.getText().toString();
                          password = retryPasswordET.getText().toString();
                          loggedIn = tryLogin();
@@ -559,7 +567,6 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             showDialog(DIALOG_WAIT);
-            initWaitHandles();
             waitForTV.setText("Waiting for "+in);
         }
     }
@@ -570,7 +577,6 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             showDialog(DIALOG_CHALLENGED);
-            initChallengedHandles();
             challengedTV.setText("Challenged by "+in);
         }
     }
