@@ -228,6 +228,11 @@ public class Fencing extends Activity
     
     private void newGame()
     {
+        if(!connected)
+        {
+            footer.setText("Connect to server first");
+            return;
+        }
         showDialog(DIALOG_NEW_GAME);
     }
     
