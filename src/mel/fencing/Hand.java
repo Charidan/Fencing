@@ -3,7 +3,7 @@ package mel.fencing;
 //TODO RFE make a common package for Card and Hand
 public class Hand
 {
-    public final int HAND_SIZE = 5;
+    public static final int HAND_SIZE = 5;
     Card card[] = new Card[HAND_SIZE];
     
     public String toString()
@@ -13,4 +13,6 @@ public class Hand
         for(Card c: card) sb.append(c.toChar());
         return sb.toString();
     }
+    
+    public Card getCard(int i) { return card[i]; } 
 }

@@ -24,4 +24,8 @@ public class Game
         whitepos = 1;
         turn = TURN_WHITE_MOVE;
     }
+    
+    public int getWhitepos() { return whitepos; }
+    public int getBlackpos() { return blackpos; }
+    public Hand getHand() { return hand; }
 }

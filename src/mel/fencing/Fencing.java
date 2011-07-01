@@ -624,6 +624,8 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
+            header.setText("");
+            footer.setText("");
             stripView.startGame(color, in);
         }
     }

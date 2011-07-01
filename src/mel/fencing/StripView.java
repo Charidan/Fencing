@@ -12,6 +12,7 @@ import android.view.View;
 public class StripView extends View
 {
     public static final int MARGIN = 5;
+    public static final int MARGIN_CARD = 15;
     public static final int FENCER_SMALL = 20;
     public static final int FENCER_BIG = 34;
     public static final int STRIP_THICK = 2;
@@ -22,10 +23,7 @@ public class StripView extends View
     private Game game = new Game(); 
     
     private boolean landscape = false;
-    Paint textPaint;
-    Paint linePaint;
-    Paint whitePaint;
-    Paint blackPaint;
+    Paint textPaint,linePaint,whitePaint,blackPaint,cardPaint;
     
     public StripView(Context context)
     {
@@ -52,6 +50,7 @@ public class StripView extends View
         linePaint.setColor(Color.GRAY);
         linePaint.setAntiAlias(true);
         linePaint.setStrokeWidth(STRIP_THICK);
+        linePaint.setStyle(Style.STROKE);
         
         whitePaint = new Paint();
         whitePaint.setColor(Color.WHITE);
@@ -62,6 +61,12 @@ public class StripView extends View
         blackPaint.setColor(Color.BLACK);
         blackPaint.setAntiAlias(true);
         blackPaint.setStyle(Style.FILL_AND_STROKE);
+        
+        cardPaint = new Paint();
+        cardPaint.setColor(Color.GRAY);
+        cardPaint.setAntiAlias(true);
+        cardPaint.setTextSize(50);
+        cardPaint.setStyle(Style.STROKE);
     }
     
     public void startGame(int color, String oppName)
@@ -115,15 +120,50 @@ public class StripView extends View
         g.drawRect(whiteX, stripTop, whiteX+fencer, stripTop+fencer, whitePaint);
         g.drawRect(blackX, stripTop, blackX+fencer, stripTop+fencer, blackPaint);
         
+        //draw position numbers
+        int posTop = stripTop+fencer+MARGIN;
+        String whitepos = ""+game.getWhitepos();
+        String blackpos = ""+game.getBlackpos();
+        textPaint.getTextBounds(whitepos, 0, whitepos.length(), bounds);
+        g.drawText(whitepos, whiteX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        textPaint.getTextBounds(blackpos, 0, blackpos.length(), bounds);
+        g.drawText(blackpos, blackX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        
+        //draw buttons and cards
+        int cardWidth,cardHeight,cardTop,cardLeft,cardStep;
         if(landscape)
         {
-            //TODO Draw buttons and cards
+            cardTop = stripTop+fencer+2*MARGIN+bounds.height();
+            cardHeight = (height-cardTop-2*MARGIN)/2;
+            cardWidth  = cardHeight*1000/1400;
+            cardStep = cardWidth+MARGIN_CARD;
+            cardLeft = (width-6*cardStep-cardWidth)/2;
         } else
         {
-            //TODO make real portait code
+            cardWidth  = (width-6*MARGIN_CARD)/5;
+            cardHeight = cardWidth*1400/1000;
+            cardTop = stripTop+fencer+4*MARGIN+bounds.height();
+            cardStep = cardWidth+MARGIN_CARD;
+            cardLeft = (width-4*cardStep-cardWidth)/2;
+        }
+        
+        
+        
+        for(int i = 0; i < Hand.HAND_SIZE; i++)
+        {
+            Card c = game.getHand().getCard(i);
+            if(c == null) continue;
+            int cardX = cardLeft+cardStep*i;
+            String value = c.toString();
+            cardPaint.getTextBounds(value, 0, value.length(), bounds);
+            int cardOffsetX = (cardWidth-bounds.width()-1)/2;
+            int cardOffsetY = (cardHeight-bounds.height()-1)/2;
+            
+            g.drawRect(cardX, cardTop, cardX+cardWidth, cardTop+cardHeight, linePaint);
+            g.drawText(value, cardX+cardOffsetX, cardTop+cardOffsetY+bounds.height(), cardPaint);
         }
     }
-    
+
     public final void setMyName(String name)  { myName = name; }
     public final void setOppName(String name) { oppName = name; }
     public final void setMyColor(int color)   { this.color = color; }
