@@ -58,6 +58,7 @@ public class Fencing extends Activity
     AlertDialog waitDialog;
     AlertDialog challengedDialog;
     FencingHandler handler;
+    StripView stripView;
     int state = STATE_DISCONNECTED;
     
     boolean refresh = false;
@@ -83,6 +84,8 @@ public class Fencing extends Activity
         registerCommand('c', new RejectedCommand());
         registerCommand('C', new WithdrawnCommand());
         registerCommand('K', new KillCommand());
+        registerCommand('b', new NewGameCommand(Game.COLOR_BLACK));
+        registerCommand('w', new NewGameCommand(Game.COLOR_WHITE));
     }
     
     private void registerCommand(Character opcode, Command command)
@@ -99,6 +102,7 @@ public class Fencing extends Activity
         handler = new FencingHandler();
         header = (TextView) findViewById( R.id.header );
         footer = (TextView) findViewById( R.id.footer );
+        stripView = (StripView) findViewById( R.id.Strip);
     }
     
     @Override
@@ -173,6 +177,7 @@ public class Fencing extends Activity
         {
             footer.setText(s.substring(1)+" has logged in successfully");
             startClientSession();
+            stripView.setMyName(username);
             return true;
         } else
         {
@@ -607,6 +612,19 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             killed = true;
+        }
+    }
+    
+    private class NewGameCommand implements Command
+    {
+        private int color;
+        
+        NewGameCommand(int color) { this.color = color; }
+        
+        @Override
+        public void execute(String in)
+        {
+            stripView.startGame(color, in);
         }
     }
 }
