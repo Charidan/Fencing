@@ -198,7 +198,7 @@ public class Fencing extends Activity
                     try
                     {
                         String s = in.readLine();
-                        if(s.startsWith("Z")) done = true;
+                        if(s == null || s.startsWith("Z")) done = true;
                         Message m = Message.obtain(handler, MESSAGE_COMMAND, s);
                         handler.sendMessage(m);
                     } 
