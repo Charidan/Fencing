@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class StripView extends View
+public class StripView extends View implements GameListener
 {
     public static final int MARGIN = 5;
     public static final int MARGIN_CARD = 15;
@@ -80,6 +80,7 @@ public class StripView extends View
     {
         super.onMeasure(x, y);
         landscape = x>y;
+        //invalidate();
     }
     
     @Override
@@ -167,4 +168,15 @@ public class StripView extends View
     public final void setMyName(String name)  { myName = name; }
     public final void setOppName(String name) { oppName = name; }
     public final void setMyColor(int color)   { this.color = color; }
+
+    public void setHand(String in)
+    {
+        game.setHand(in);
+    }
+
+    @Override
+    public void gameChanged()
+    {
+        postInvalidate();
+    }
 }
