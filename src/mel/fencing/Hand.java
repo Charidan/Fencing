@@ -14,5 +14,14 @@ public class Hand
         return sb.toString();
     }
     
-    public Card getCard(int i) { return card[i]; } 
+    public Card getCard(int i) { return card[i]; }
+
+    public void setHand(String in)
+    {
+        for(int i = 0; i < HAND_SIZE; i++)
+        {
+            if(in.charAt(i) == '0') card[i] = null;
+            else card[i] = new Card(in.charAt(i));
+        }
+    } 
 }

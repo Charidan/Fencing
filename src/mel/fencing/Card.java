@@ -6,6 +6,7 @@ public class Card
     private final int value;
     
     public Card(int value) { this.value = value; }
+    public Card(char value) { this.value = value-'0'; }
 
     public int getValue() { return value; }
     

@@ -86,6 +86,7 @@ public class Fencing extends Activity
         registerCommand('K', new KillCommand());
         registerCommand('b', new NewGameCommand(Game.COLOR_BLACK));
         registerCommand('w', new NewGameCommand(Game.COLOR_WHITE));
+        registerCommand('h', new SetHandCommand());
     }
     
     private void registerCommand(Character opcode, Command command)
@@ -627,6 +628,16 @@ public class Fencing extends Activity
             header.setText("");
             footer.setText("");
             stripView.startGame(color, in);
+            waitDialog.dismiss();
+        }
+    }
+    
+    private class SetHandCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            stripView.setHand(in);
         }
     }
 }
