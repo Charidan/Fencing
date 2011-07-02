@@ -73,6 +73,8 @@ public class Fencing extends Activity
     private boolean tryingLogin = false;
     private boolean killed = false;
     
+    static StripModel stripModel = new StripModel();
+    
     private HashMap<Character,Command> opcode2Command = new HashMap<Character,Command>();
     
     public Fencing()

@@ -17,10 +17,7 @@ public class StripView extends View implements GameListener
     public static final int FENCER_BIG = 34;
     public static final int STRIP_THICK = 2;
     
-    private String myName = "Not Logged In";
-    private String oppName = "Evil Bad Guy";
-    private int color = Game.COLOR_NONE;
-    private Game game = new Game(); 
+    public StripModel model = null;
     
     private boolean landscape = false;
     Paint textPaint,linePaint,whitePaint,blackPaint,cardPaint;
@@ -69,6 +66,8 @@ public class StripView extends View implements GameListener
         cardPaint.setStyle(Style.STROKE);
     }
     
+    private void resetModel() { model = Fencing.stripModel; }
+    
     public void startGame(int color, String oppName)
     {
         setOppName(oppName);
@@ -84,8 +83,10 @@ public class StripView extends View implements GameListener
     }
     
     @Override
-    public void onDraw(Canvas g)
+    synchronized public void onDraw(Canvas g)
     {
+        resetModel();
+        
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
         int step = (width-2*MARGIN)/23;
@@ -93,14 +94,14 @@ public class StripView extends View implements GameListener
         Rect bounds = new Rect();
         
         String whiteName,blackName;
-        if(color == Game.COLOR_BLACK)
+        if(model.getColor() == Game.COLOR_BLACK)
         {
-            whiteName = oppName;
-            blackName = myName;
+            whiteName = model.getOppName();
+            blackName = model.getMyName();
         } else
         {
-            whiteName = myName;
-            blackName = oppName;
+            whiteName = model.getMyName();
+            blackName = model.getOppName();
         }
         
         textPaint.getTextBounds(whiteName, 0, whiteName.length(), bounds);
@@ -111,8 +112,8 @@ public class StripView extends View implements GameListener
         int fencer = landscape ? FENCER_BIG : FENCER_SMALL;
         
         int stripTop = 2*MARGIN+bounds.height()+fencer;
-        int whiteX = startX+(game.whitepos-1)*step;
-        int blackX = startX+(game.blackpos-1)*step;            
+        int whiteX = startX+(model.getGame().whitepos-1)*step;
+        int blackX = startX+(model.getGame().blackpos-1)*step;            
         
         //draw the strip
         g.drawLine(startX, stripTop+fencer, startX+23*step, stripTop+fencer, linePaint);
@@ -123,8 +124,8 @@ public class StripView extends View implements GameListener
         
         //draw position numbers
         int posTop = stripTop+fencer+MARGIN;
-        String whitepos = ""+game.getWhitepos();
-        String blackpos = ""+game.getBlackpos();
+        String whitepos = ""+model.getGame().getWhitepos();
+        String blackpos = ""+model.getGame().getBlackpos();
         textPaint.getTextBounds(whitepos, 0, whitepos.length(), bounds);
         g.drawText(whitepos, whiteX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
         textPaint.getTextBounds(blackpos, 0, blackpos.length(), bounds);
@@ -152,7 +153,7 @@ public class StripView extends View implements GameListener
         
         for(int i = 0; i < Hand.HAND_SIZE; i++)
         {
-            Card c = game.getHand().getCard(i);
+            Card c = model.getGame().getHand().getCard(i);
             if(c == null) continue;
             int cardX = cardLeft+cardStep*i;
             String value = c.toString();
@@ -165,13 +166,14 @@ public class StripView extends View implements GameListener
         }
     }
 
-    public final void setMyName(String name)  { myName = name; }
-    public final void setOppName(String name) { oppName = name; }
-    public final void setMyColor(int color)   { this.color = color; }
+    public final void setMyName(String name)  { model.setMyName(name); }
+    public final void setOppName(String name) { model.setOppName(name); }
+    public final void setMyColor(int color)   { model.setColor(color); }
 
-    public void setHand(String in)
+    synchronized public void setHand(String in)
     {
-        game.setHand(in);
+        resetModel();
+        model.getGame().setHand(in);
     }
 
     @Override
