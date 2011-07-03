@@ -625,7 +625,7 @@ public class Fencing extends Activity
             header.setText("");
             footer.setText("");
             stripView.startGame(color, in);
-            waitDialog.dismiss();
+            if(waitDialog != null) waitDialog.dismiss();
             stripModel.setState(StripModel.STATE_GAME);
         }
     }
