@@ -17,6 +17,9 @@ public class StripView extends View implements GameListener
     public static final int FENCER_BIG = 34;
     public static final int STRIP_THICK = 2;
     
+    public static final String SUBMIT = "GO";
+    public static final String RESET = "RESET";
+    
     public StripModel model = null;
     
     private boolean landscape = false;
@@ -79,12 +82,12 @@ public class StripView extends View implements GameListener
     {
         super.onMeasure(x, y);
         landscape = x>y;
-        //invalidate();
     }
     
     @Override
     synchronized public void onDraw(Canvas g)
     {
+        // TODO move variables related to button/card position to model so touch events will have them
         resetModel();
         
         int width = getMeasuredWidth();
@@ -133,10 +136,15 @@ public class StripView extends View implements GameListener
         
         //draw buttons and cards
         int cardWidth,cardHeight,cardTop,cardLeft,cardStep;
+        int goLeft, goTop, goRight, goBottom;
+        int stopLeft, stopRight, stopTop, stopBottom;
+        
+        int textOffsetX, textOffsetY;
+        
         if(landscape)
         {
             cardTop = stripTop+fencer+2*MARGIN+bounds.height();
-            cardHeight = (height-cardTop-2*MARGIN)/2;
+            cardHeight = (height-cardTop-2*MARGIN_CARD)/2;
             cardWidth  = cardHeight*1000/1400;
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-6*cardStep-cardWidth)/2;
@@ -147,9 +155,7 @@ public class StripView extends View implements GameListener
             cardTop = stripTop+fencer+4*MARGIN+bounds.height();
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-4*cardStep-cardWidth)/2;
-        }
-        
-        
+        }       
         
         for(int i = 0; i < Hand.HAND_SIZE; i++)
         {
@@ -158,12 +164,48 @@ public class StripView extends View implements GameListener
             int cardX = cardLeft+cardStep*i;
             String value = c.toString();
             cardPaint.getTextBounds(value, 0, value.length(), bounds);
-            int cardOffsetX = (cardWidth-bounds.width()-1)/2;
-            int cardOffsetY = (cardHeight-bounds.height()-1)/2;
+            textOffsetX = (cardWidth-bounds.width()-1)/2;
+            textOffsetY = (cardHeight-bounds.height()-1)/2;
             
             g.drawRect(cardX, cardTop, cardX+cardWidth, cardTop+cardHeight, linePaint);
-            g.drawText(value, cardX+cardOffsetX, cardTop+cardOffsetY+bounds.height(), cardPaint);
+            g.drawText(value, cardX+textOffsetX, cardTop+textOffsetY+bounds.height(), cardPaint);
         }
+        
+        if(landscape)
+        {
+            goTop = cardTop;
+            goBottom = cardTop + cardHeight;
+            goLeft = cardLeft + 5*cardStep + 2*MARGIN_CARD;
+            goRight = goLeft + 2*cardWidth;
+            stopTop = goBottom + MARGIN_CARD;
+            stopBottom = stopTop + cardHeight + MARGIN;
+            stopLeft = goLeft;
+            stopRight = goRight;
+        } 
+        else 
+        {
+            // TODO move this button vertically once the drop targets are in place
+            goTop = height - MARGIN - cardHeight;
+            goBottom = height - MARGIN;
+            goRight = width/2 - MARGIN_CARD/2;
+            goLeft = MARGIN_CARD;
+            stopTop = goTop;
+            stopBottom = goBottom;
+            stopLeft = width/2 + MARGIN_CARD/2;
+            stopRight = width - MARGIN_CARD;
+        }
+        
+        cardPaint.getTextBounds(SUBMIT, 0, SUBMIT.length(), bounds);
+        textOffsetX = (goRight-goLeft-bounds.width()-1)/2;
+        textOffsetY = (goBottom-goTop-bounds.height()-1)/2;
+        g.drawRect(goLeft, goTop, goRight, goBottom, linePaint); 
+        g.drawText(SUBMIT, goLeft+textOffsetX, goTop+textOffsetY+bounds.height(), cardPaint);
+        
+        cardPaint.getTextBounds(RESET, 0, RESET.length(), bounds);
+        textOffsetX = (stopRight-stopLeft-bounds.width()-1)/2;
+        textOffsetY = (stopBottom-stopTop-bounds.height()-1)/2;
+        g.drawRect(stopLeft, stopTop, stopRight, stopBottom, linePaint); 
+        g.drawText(RESET, stopLeft+textOffsetX, stopTop+textOffsetY+bounds.height(), cardPaint);
     }
 
     public final void setMyName(String name)  { model.setMyName(name); }
