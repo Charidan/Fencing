@@ -35,10 +35,6 @@ public class Fencing extends Activity
     public static final int MESSAGE_ERROR = 0;
     public static final int MESSAGE_COMMAND = 1;
     
-    public static final int STATE_DISCONNECTED = 0;
-    public static final int STATE_CONNECTED = 1;
-    public static final int STATE_CHALLENGE_SENT = 2;
-    
     TextView header;
     TextView footer;
     String headerText = "";
@@ -59,7 +55,6 @@ public class Fencing extends Activity
     AlertDialog challengedDialog;
     FencingHandler handler;
     StripView stripView;
-    int state = STATE_DISCONNECTED;
     
     boolean refresh = false;
     
@@ -243,7 +238,7 @@ public class Fencing extends Activity
         connected = false;
         loggedIn = false;
         tryingLogin = false;
-        state = STATE_DISCONNECTED;
+        stripModel.setState(StripModel.STATE_SPLASH);
         try
         {
             if(socket != null) socket.close();
@@ -631,6 +626,7 @@ public class Fencing extends Activity
             footer.setText("");
             stripView.startGame(color, in);
             waitDialog.dismiss();
+            stripModel.setState(StripModel.STATE_GAME);
         }
     }
     

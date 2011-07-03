@@ -19,6 +19,7 @@ public class StripView extends View implements GameListener
     
     public static final String SUBMIT = "GO";
     public static final String RESET = "RESET";
+    public static final String FENCING = "FENCING";
     
     public StripModel model = null;
     
@@ -96,6 +97,17 @@ public class StripView extends View implements GameListener
         int startX = (width+1-step*23)/2;
         Rect bounds = new Rect();
         
+        //Splash Screen
+        if(model.getState() == StripModel.STATE_SPLASH)
+        {
+            //TODO replace with splash picture
+            cardPaint.getTextBounds(FENCING, 0, FENCING.length(), bounds);
+            float fencingX = (width-bounds.width())/2;
+            float fencingY = (height-bounds.height())/2;
+            g.drawText(FENCING, fencingX, fencingY, cardPaint);
+            return;
+        }
+        
         String whiteName,blackName;
         if(model.getColor() == Game.COLOR_BLACK)
         {
@@ -167,8 +179,8 @@ public class StripView extends View implements GameListener
             float cardX = cardLeft+cardStep*i;
             String value = c.toString();
             cardPaint.getTextBounds(value, 0, value.length(), bounds);
-            textOffsetX = (cardWidth-bounds.width()-1)/2;
-            textOffsetY = (cardHeight-bounds.height()-1)/2;
+            textOffsetX = (cardWidth-bounds.width())/2;
+            textOffsetY = (cardHeight-bounds.height())/2;
             
             g.drawRect(cardX, cardTop, cardX+cardWidth, cardBottom, linePaint);
             g.drawText(value, cardX+textOffsetX, cardTop+textOffsetY+bounds.height(), cardPaint);
@@ -198,14 +210,14 @@ public class StripView extends View implements GameListener
         }
         
         cardPaint.getTextBounds(SUBMIT, 0, SUBMIT.length(), bounds);
-        textOffsetX = (goRight-goLeft-bounds.width()-1)/2;
-        textOffsetY = (goBottom-goTop-bounds.height()-1)/2;
+        textOffsetX = (goRight-goLeft-bounds.width())/2;
+        textOffsetY = (goBottom-goTop-bounds.height())/2;
         g.drawRect(goLeft, goTop, goRight, goBottom, linePaint); 
         g.drawText(SUBMIT, goLeft+textOffsetX, goTop+textOffsetY+bounds.height(), cardPaint);
         
         cardPaint.getTextBounds(RESET, 0, RESET.length(), bounds);
-        textOffsetX = (stopRight-stopLeft-bounds.width()-1)/2;
-        textOffsetY = (stopBottom-stopTop-bounds.height()-1)/2;
+        textOffsetX = (stopRight-stopLeft-bounds.width())/2;
+        textOffsetY = (stopBottom-stopTop-bounds.height())/2;
         g.drawRect(stopLeft, stopTop, stopRight, stopBottom, linePaint); 
         g.drawText(RESET, stopLeft+textOffsetX, stopTop+textOffsetY+bounds.height(), cardPaint);
         
