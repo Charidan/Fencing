@@ -114,6 +114,7 @@ public class StripView extends View implements GameListener
         
         int fencer = landscape ? FENCER_BIG : FENCER_SMALL;
         
+        //TODO RFE use a selector to remove the chance of accidental change to position
         int stripTop = 2*MARGIN+bounds.height()+fencer;
         int whiteX = startX+(model.getGame().whitepos-1)*step;
         int blackX = startX+(model.getGame().blackpos-1)*step;            
@@ -135,19 +136,20 @@ public class StripView extends View implements GameListener
         g.drawText(blackpos, blackX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
         
         //draw buttons and cards
-        int cardWidth,cardHeight,cardTop,cardLeft,cardStep;
-        int goLeft, goTop, goRight, goBottom;
-        int stopLeft, stopRight, stopTop, stopBottom;
-        
-        int textOffsetX, textOffsetY;
+        float cardWidth,cardHeight,cardTop,cardBottom,cardLeft,cardStep;
+        float goLeft, goTop, goRight, goBottom;
+        float stopLeft, stopRight, stopTop, stopBottom;
+        float actionLeft, actionTop, actionBottom, actionWidth, actionStep;
+        float textOffsetX, textOffsetY;
         
         if(landscape)
         {
             cardTop = stripTop+fencer+2*MARGIN+bounds.height();
-            cardHeight = (height-cardTop-2*MARGIN_CARD)/2;
+            cardHeight = (height-cardTop-2*MARGIN_CARD-2*MARGIN)/2;
             cardWidth  = cardHeight*1000/1400;
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-6*cardStep-cardWidth)/2;
+            cardBottom = cardHeight+cardTop;
         } else
         {
             cardWidth  = (width-6*MARGIN_CARD)/5;
@@ -155,38 +157,38 @@ public class StripView extends View implements GameListener
             cardTop = stripTop+fencer+4*MARGIN+bounds.height();
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-4*cardStep-cardWidth)/2;
+            cardBottom = cardHeight+cardTop;
         }       
         
         for(int i = 0; i < Hand.HAND_SIZE; i++)
         {
             Card c = model.getGame().getHand().getCard(i);
             if(c == null) continue;
-            int cardX = cardLeft+cardStep*i;
+            float cardX = cardLeft+cardStep*i;
             String value = c.toString();
             cardPaint.getTextBounds(value, 0, value.length(), bounds);
             textOffsetX = (cardWidth-bounds.width()-1)/2;
             textOffsetY = (cardHeight-bounds.height()-1)/2;
             
-            g.drawRect(cardX, cardTop, cardX+cardWidth, cardTop+cardHeight, linePaint);
+            g.drawRect(cardX, cardTop, cardX+cardWidth, cardBottom, linePaint);
             g.drawText(value, cardX+textOffsetX, cardTop+textOffsetY+bounds.height(), cardPaint);
         }
         
         if(landscape)
         {
             goTop = cardTop;
-            goBottom = cardTop + cardHeight;
+            goBottom = cardBottom;
             goLeft = cardLeft + 5*cardStep + 2*MARGIN_CARD;
             goRight = goLeft + 2*cardWidth;
             stopTop = goBottom + MARGIN_CARD;
-            stopBottom = stopTop + cardHeight + MARGIN;
+            stopBottom = stopTop + cardHeight + 2*MARGIN;
             stopLeft = goLeft;
             stopRight = goRight;
         } 
         else 
         {
-            // TODO move this button vertically once the drop targets are in place
-            goTop = height - MARGIN - cardHeight;
-            goBottom = height - MARGIN;
+            goTop = cardBottom+2*MARGIN_CARD+cardHeight+2*MARGIN;
+            goBottom = goTop+cardHeight+2*MARGIN;
             goRight = width/2 - MARGIN_CARD/2;
             goLeft = MARGIN_CARD;
             stopTop = goTop;
@@ -206,6 +208,31 @@ public class StripView extends View implements GameListener
         textOffsetY = (stopBottom-stopTop-bounds.height()-1)/2;
         g.drawRect(stopLeft, stopTop, stopRight, stopBottom, linePaint); 
         g.drawText(RESET, stopLeft+textOffsetX, stopTop+textOffsetY+bounds.height(), cardPaint);
+        
+        // draw action spaces for holding cards
+        if(landscape)
+        {
+            actionTop = goBottom + MARGIN_CARD;
+            actionBottom = actionTop+cardHeight+2*MARGIN;
+            actionLeft = cardLeft;
+            actionWidth = (cardStep*5-3*MARGIN_CARD)/3;
+            actionStep = actionWidth+MARGIN_CARD;
+        }
+        else
+        {
+            actionTop = cardBottom+MARGIN_CARD;
+            actionBottom = actionTop+cardHeight+2*MARGIN;
+            actionLeft = cardLeft;
+            actionWidth = (cardStep*5-3*MARGIN_CARD)/3;
+            actionStep = actionWidth+MARGIN_CARD;
+        }
+        
+        for(int i=0; i<3; i++)
+        {
+            float actionX = actionLeft+actionStep*i;
+            g.drawRect(actionX, actionTop, actionX+actionWidth, actionBottom, linePaint);
+            //renderActionHolder(g, actionTop, actionX+actionWidth, actionBottom); 
+        }
     }
 
     public final void setMyName(String name)  { model.setMyName(name); }
