@@ -114,12 +114,28 @@ public class StripView extends View implements GameListener
     
     private void tryGrab(float x, float y)
     {
-        // TODO if (x,y) is over a card, start dragging it
+        // if (x,y) is over a card, start dragging it
+        if(y<model.getCardTop() || y>model.getCardBottom() || x<model.getCardLeft() ) return;
+        x -= model.getCardLeft();
+        float offsetX = x % model.getCardStep();
+        float offsetY = y - model.getCardTop();
+        int slot = (int)(x/model.getCardStep());
+        if(offsetX > model.getCardWidth()) return;
+        
+        // TODO remove card from hand -- takeCard() instead of getCard()
+        Card card = model.getGame().getHand().getCard(slot);
+        if(card == null) return;
+        
+        model.setDragging(true);
+        model.setDragValue(card.getValue());
+        model.setDragOffset(offsetX, offsetY);
+        model.setDragPosition(offsetX, offsetY);
     }
 
     private void abortDrag()
     {
-        model.setDragging(false);
+        // TODO return card to hand
+        model.setDragging(false);   
     }
 
     private void tryDrop(float x, float y)
@@ -130,7 +146,8 @@ public class StripView extends View implements GameListener
 
     private void animateDrag(float x, float y)
     {
-        // TODO animate drag
+        model.setDragPosition(x, y);
+        invalidate();
     }
 
     @Override
@@ -143,15 +160,16 @@ public class StripView extends View implements GameListener
         int step = (width-2*MARGIN)/23;
         int startX = (width+1-step*23)/2;
         Rect bounds = new Rect();
+        float textOffsetX, textOffsetY;
         
         //Splash Screen
         if(model.getState() == StripModel.STATE_SPLASH)
         {
             //TODO replace with splash picture
             cardPaint.getTextBounds(FENCING, 0, FENCING.length(), bounds);
-            float fencingX = (width-bounds.width())/2;
-            float fencingY = (height-bounds.height())/2;
-            g.drawText(FENCING, fencingX, fencingY, cardPaint);
+            textOffsetX = (width-bounds.width())/2;
+            textOffsetY = (height-bounds.height())/2;
+            g.drawText(FENCING, textOffsetX, textOffsetY, cardPaint);
             return;
         }
         
@@ -199,7 +217,6 @@ public class StripView extends View implements GameListener
         float goLeft, goTop, goRight, goBottom;
         float stopLeft, stopRight, stopTop, stopBottom;
         float actionLeft, actionTop, actionBottom, actionWidth, actionStep;
-        float textOffsetX, textOffsetY;
         
         if(landscape)
         {
@@ -291,6 +308,19 @@ public class StripView extends View implements GameListener
             float actionX = actionLeft+actionStep*i;
             g.drawRect(actionX, actionTop, actionX+actionWidth, actionBottom, linePaint);
             //renderActionHolder(g, actionTop, actionX+actionWidth, actionBottom); 
+        }
+        
+        if(model.isDragging()) 
+        {
+            // TODO consider a new paint for the dragging rectangle
+            float x = model.getDragPositionX() - model.getDragOffsetX();
+            float y = model.getDragPositionY() - model.getDragOffsetY();
+            g.drawRect(x, y, x+cardWidth, y+cardHeight, linePaint);
+            String val = ""+model.getDragValue();
+            cardPaint.getTextBounds(val, 0, val.length(), bounds);
+            textOffsetX = (cardWidth-bounds.width())/2;
+            textOffsetY = (cardHeight-bounds.height())/2+bounds.height();
+            g.drawText(val, x+textOffsetX, y+textOffsetY, cardPaint);
         }
         
         //save screen position in case of a touch event

@@ -14,8 +14,31 @@ public class Hand
         return sb.toString();
     }
     
-    public Card getCard(int i) { return card[i]; }
-
+    public Card getCard(int i) 
+    {
+        try
+        {
+            return card[i]; 
+        }
+        catch(ArrayIndexOutOfBoundsException ex)
+        {
+            return null;
+        }
+    }
+    
+    public Card takeCard(int i)
+    {
+        try
+        {
+            Card result = card[i];
+            card[i] = null;
+            return result;
+        }
+        catch(ArrayIndexOutOfBoundsException ex)
+        {
+            return null;
+        }
+    }
     public void setHand(String in)
     {
         for(int i = 0; i < HAND_SIZE; i++)

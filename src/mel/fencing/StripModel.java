@@ -68,13 +68,17 @@ public class StripModel
     private boolean dragging;               // true when dragging a card
     private int dragValue;                  // the number of the card being dragged
     private float dragOffsetX, dragOffsetY; // position of the touch relative to topLeft of the card
+    private float dragPosX, dragPosY;       // position finger last detected at
     
     public final boolean isDragging()      { return dragging; }
     public final int getDragValue()     { return dragValue; }
     public final float getDragOffsetX()   { return dragOffsetX; }
     public final float getDragOffsetY()   { return dragOffsetY; }
+    public final float getDragPositionX()   { return dragPosX; }
+    public final float getDragPositionY()   { return dragPosY; }
     
     public final void setDragging(boolean in)   { dragging = in; }
     public final void setDragValue(int in)      { dragValue = in; }
     public final void setDragOffset(float x, float y) { dragOffsetX = x; dragOffsetY = y; }
+    public final void setDragPosition(float x, float y) { dragPosX = x; dragPosY = y; }
 }
