@@ -245,6 +245,27 @@ public class StripView extends View implements GameListener
             g.drawRect(actionX, actionTop, actionX+actionWidth, actionBottom, linePaint);
             //renderActionHolder(g, actionTop, actionX+actionWidth, actionBottom); 
         }
+        
+        //save screen position in case of a touch event
+        model.setCardWidth(cardWidth);
+        model.setCardHeight(cardHeight);
+        model.setCardTop(cardTop);
+        model.setCardBottom(cardBottom);
+        model.setCardLeft(cardLeft);
+        model.setCardStep(cardStep);
+        model.setGoLeft(goLeft);
+        model.setGoTop(goTop);
+        model.setGoRight(goRight);
+        model.setGoBottom(goBottom);
+        model.setStopLeft(goLeft);
+        model.setStopRight(stopRight);
+        model.setStopTop(stopTop);
+        model.setStopBottom(stopBottom);
+        model.setActionLeft(actionLeft);
+        model.setActionTop(actionTop);
+        model.setActionBottom(actionBottom);
+        model.setActionWidth(actionWidth);
+        model.setActionStep(actionStep); 
     }
 
     public final void setMyName(String name)  { model.setMyName(name); }
