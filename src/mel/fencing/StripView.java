@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class StripView extends View implements GameListener
@@ -86,9 +87,55 @@ public class StripView extends View implements GameListener
     }
     
     @Override
+    synchronized public boolean onTouchEvent(MotionEvent e)
+    {
+        switch(e.getAction())
+        {
+            case MotionEvent.ACTION_CANCEL:
+                if(model.isDragging()) abortDrag();
+            break;
+            
+            case MotionEvent.ACTION_DOWN:
+                if(model.isDragging()) abortDrag();
+                tryGrab(e.getX(), e.getY());
+            break;
+            
+            case MotionEvent.ACTION_MOVE:
+                if(model.isDragging()) animateDrag(e.getX(), e.getY());
+            break;
+            
+            case MotionEvent.ACTION_UP:
+                if(model.isDragging()) tryDrop(e.getX(), e.getY());
+            break;
+        }
+        // opaque to touch
+        return true;
+    }
+    
+    private void tryGrab(float x, float y)
+    {
+        // TODO if (x,y) is over a card, start dragging it
+    }
+
+    private void abortDrag()
+    {
+        model.setDragging(false);
+    }
+
+    private void tryDrop(float x, float y)
+    {
+        // TODO implement drop
+        
+    }
+
+    private void animateDrag(float x, float y)
+    {
+        // TODO animate drag
+    }
+
+    @Override
     synchronized public void onDraw(Canvas g)
     {
-        // TODO move variables related to button/card position to model so touch events will have them
         resetModel();
         
         int width = getMeasuredWidth();

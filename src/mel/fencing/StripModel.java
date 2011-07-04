@@ -64,4 +64,17 @@ public class StripModel
     public final void setActionBottom(float in) { actionBottom = in; }
     public final void setActionWidth(float in)  { actionWidth = in; }
     public final void setActionStep(float in)   { actionStep = in; }
+    
+    private boolean dragging;               // true when dragging a card
+    private int dragValue;                  // the number of the card being dragged
+    private float dragOffsetX, dragOffsetY; // position of the touch relative to topLeft of the card
+    
+    public final boolean isDragging()      { return dragging; }
+    public final int getDragValue()     { return dragValue; }
+    public final float getDragOffsetX()   { return dragOffsetX; }
+    public final float getDragOffsetY()   { return dragOffsetY; }
+    
+    public final void setDragging(boolean in)   { dragging = in; }
+    public final void setDragValue(int in)      { dragValue = in; }
+    public final void setDragOffset(float x, float y) { dragOffsetX = x; dragOffsetY = y; }
 }
