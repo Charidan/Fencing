@@ -2,6 +2,7 @@ package mel.fencing;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.TextView;
 
 public class StripModel
 {
@@ -98,4 +99,17 @@ public class StripModel
     public void setRetreatCard(Card in) { retreatCard = in; }
     public void setAdvanceCard(Card in) { advanceCard = in; }
     public void addAttackCard(Card in)  { attackList.add(in); }
+    
+    TextView header;
+    TextView footer;
+    
+    public void setHeader(String in)
+    {
+        header.setText(in);
+    }
+    
+    public void setFooter(String in)
+    {
+        footer.setText(in);
+    }
 }

@@ -35,10 +35,6 @@ public class Fencing extends Activity
     public static final int MESSAGE_ERROR = 0;
     public static final int MESSAGE_COMMAND = 1;
     
-    TextView header;
-    TextView footer;
-    String headerText = "";
-    String footerText = "";
     EditText usernameET = null;
     EditText newGameUsernameET = null;
     EditText passwordET;
@@ -67,7 +63,7 @@ public class Fencing extends Activity
     private boolean loggedIn = false;
     private boolean tryingLogin = false;
     private boolean killed = false;
-    private boolean debug = false;
+    private boolean debug = true;
     
     static StripModel stripModel = new StripModel();
     
@@ -99,8 +95,8 @@ public class Fencing extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         handler = new FencingHandler();
-        header = (TextView) findViewById( R.id.header );
-        footer = (TextView) findViewById( R.id.footer );
+        stripModel.header = (TextView) findViewById( R.id.header );
+        stripModel.footer = (TextView) findViewById( R.id.footer );
         stripView = (StripView) findViewById( R.id.Strip);
     }
     
@@ -135,8 +131,8 @@ public class Fencing extends Activity
     
     private void fakeGame()
     {
-        header.setText("");
-        footer.setText("");
+        stripModel.setHeader("");
+        stripModel.setFooter("");
         stripView.startGame(Game.COLOR_WHITE, "FakeOpponent");
         stripView.setHand("15324");
         stripModel.setState(StripModel.STATE_GAME);
@@ -156,12 +152,12 @@ public class Fencing extends Activity
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintStream(socket.getOutputStream());
             connected = true;
-            header.setText("Connection Successful!");
+            stripModel.setHeader("Connection Successful!");
         }
         catch(IOException e)
         {
-            header.setText("Connection Failed");
-            footer.setText(e.getMessage());
+            stripModel.setHeader("Connection Failed");
+            stripModel.setFooter(e.getMessage());
         }
         if(loggedIn) disconnect();
     }
@@ -178,19 +174,19 @@ public class Fencing extends Activity
         }
         catch (IOException e)
         {
-            footer.setText(e.getMessage());
+            stripModel.setFooter(e.getMessage());
             disconnect();
             return false;
         }
         if(s.startsWith("L"))
         {
-            footer.setText(s.substring(1)+" has logged in successfully");
+            stripModel.setFooter(s.substring(1)+" has logged in successfully");
             startClientSession();
             stripView.setMyName(username);
             return true;
         } else
         {
-            footer.setText("Login failed with name \""+s.substring(1)+"\"");
+            stripModel.setFooter("Login failed with name \""+s.substring(1)+"\"");
             return false;
         }
     }
@@ -228,7 +224,7 @@ public class Fencing extends Activity
     {
         if(!connected)
         {
-            footer.setText("Connect to server first");
+            stripModel.setFooter("Connect to server first");
             return;
         }
         showDialog(DIALOG_NEW_GAME);
@@ -236,14 +232,14 @@ public class Fencing extends Activity
     
     public void showHelp()
     {
-        footer.setText("If you have to ask, you don't already know");
+        stripModel.setFooter("If you have to ask, you don't already know");
     }
     
     synchronized private void disconnect()
     {
         if(killed)
         {
-            footer.setText("You were logged out due to duplicate log in");
+            stripModel.setFooter("You were logged out due to duplicate log in");
             killed = false;
         }
         connected = false;
@@ -261,8 +257,8 @@ public class Fencing extends Activity
         socket = null;
         in = null;
         out = null;
-        footer.setText("");
-        header.setText("Disconnected");
+        stripModel.setFooter("");
+        stripModel.setHeader("Disconnected");
     }
     
     @Override
@@ -545,19 +541,19 @@ public class Fencing extends Activity
             switch(m.what)
             {
                 case MESSAGE_ERROR:
-                    header.setText("Exception Received");
+                    stripModel.setHeader("Exception Received");
                     Exception ex = (Exception) m.obj;
-                    footer.setText(ex.getMessage());
+                    stripModel.setFooter(ex.getMessage());
                 break;
                 case MESSAGE_COMMAND:
-                    header.setText("Command Received");
+                    stripModel.setHeader("Command Received");
                     String s = (String) m.obj;
                     if(s == null || s.length()<1) return; // ignore empty messages
                     Command c = opcode2Command.get(s.charAt(0));
                     if(c == null)
                     {
-                        header.setText("Unknown Sever Command");
-                        footer.setText(s);
+                        stripModel.setHeader("Unknown Sever Command");
+                        stripModel.setFooter(s);
                     }
                     else c.execute(s.substring(1));
                 break;
@@ -570,8 +566,8 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
-            header.setText("Server Error");
-            footer.setText("Error: "+in);
+            stripModel.setHeader("Server Error");
+            stripModel.setFooter("Error: "+in);
         }
     }
     
@@ -601,7 +597,7 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             waitDialog.dismiss();
-            footer.setText("Challenge Rejected");
+            stripModel.setFooter("Challenge Rejected");
         }
     }
     
@@ -611,7 +607,7 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             challengedDialog.dismiss();
-            footer.setText("Challenge Withdrawn");
+            stripModel.setFooter("Challenge Withdrawn");
         }
     }
     
@@ -633,8 +629,8 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
-            header.setText("");
-            footer.setText("");
+            stripModel.setHeader("");
+            stripModel.setFooter("");
             stripView.startGame(color, in);
             if(waitDialog != null) waitDialog.dismiss();
             stripModel.setState(StripModel.STATE_GAME);

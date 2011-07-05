@@ -137,11 +137,46 @@ public class StripView extends View implements GameListener
         // TODO return card to hand
         model.setDragging(false);   
     }
-
+    
     private void tryDrop(float x, float y)
     {
-        // TODO implement drop
+        int slot = getActionSlot(x, y);
         
+        switch(slot)
+        {
+            //TODO check for legal moves
+            //TODO replace with reference to card taken from hand
+            case SLOT_RETREAT:
+                model.setRetreatCard(new Card(model.getDragValue()));
+                model.setFooter("retreat: "+model.getDragValue());
+            return;
+            case SLOT_ADVANCE:
+                model.setAdvanceCard(new Card(model.getDragValue()));
+                model.setFooter("advance: "+model.getDragValue());
+            return;
+            case SLOT_ATTACK:
+                //TODO handle attack cards of different value
+                model.addAttackCard(new Card(model.getDragValue()));
+                model.setFooter("attack: "+model.getDragValue());
+            return;
+            case -1:
+                abortDrag();
+            break;
+        }
+    }
+    
+    /**
+     * @return find the slot# of the action slot at (x,y) or -1 if not on a slot
+     */
+    private int getActionSlot(float x, float y)
+    {
+        if(y<model.getActionTop() || y>model.getActionBottom() || x<model.getActionLeft() ) return -1;
+        x -= model.getActionLeft();
+        float offsetX = x % model.getActionStep();
+        int slot = (int)(x/model.getActionStep());
+        if(offsetX > model.getActionWidth()) return -1;
+        if(slot >= model.slots.length) return -1;
+        return model.slots[slot];
     }
 
     private void animateDrag(float x, float y)
@@ -341,7 +376,7 @@ public class StripView extends View implements GameListener
         model.setActionTop(actionTop);
         model.setActionBottom(actionBottom);
         model.setActionWidth(actionWidth);
-        model.setActionStep(actionStep); 
+        model.setActionStep(actionStep);
     }
 
     public static final int SLOT_RETREAT = 0;
