@@ -306,8 +306,7 @@ public class StripView extends View implements GameListener
         for(int i=0; i<3; i++)
         {
             float actionX = actionLeft+actionStep*i;
-            g.drawRect(actionX, actionTop, actionX+actionWidth, actionBottom, linePaint);
-            //renderActionHolder(g, actionTop, actionX+actionWidth, actionBottom); 
+            renderActionHolder(g, i, actionX, actionTop, actionX+actionWidth, actionBottom); 
         }
         
         if(model.isDragging()) 
@@ -345,9 +344,42 @@ public class StripView extends View implements GameListener
         model.setActionStep(actionStep); 
     }
 
+    public static final int SLOT_RETREAT = 0;
+    public static final int SLOT_ADVANCE = 1;
+    public static final int SLOT_ATTACK = 2;
+    // TODO replace these with pictures
+    public static final String PIC_LEFT = "<==";
+    public static final String PIC_RIGHT = "==>";
+    public static final String PIC_ATTACK = "+";
+    public static final int leftSlots[] = { SLOT_RETREAT, SLOT_ADVANCE, SLOT_ATTACK };
+    public static final String leftPics[] = { PIC_LEFT, PIC_RIGHT, PIC_ATTACK };
+    public static final int rightSlots[] = { SLOT_ATTACK, SLOT_ADVANCE, SLOT_RETREAT };
+    public static final String rightPics[] = { PIC_ATTACK, PIC_LEFT, PIC_RIGHT };
+    
+    private void renderActionHolder(Canvas g, int slot, float left, float top, float right, float bottom)
+    {
+        Rect bounds = new Rect();
+        float textOffsetX, textOffsetY;
+        
+        g.drawRect(left, top, right, bottom, linePaint);
+        
+        //TODO if(empty)
+            cardPaint.getTextBounds(model.pics[slot], 0, model.pics[slot].length(), bounds);
+            textOffsetY = (bottom-top-bounds.height())/2;
+            textOffsetX = (right-left-bounds.width())/2;
+            g.drawText(model.pics[slot], left+textOffsetX, top+textOffsetY+bounds.height(), cardPaint);
+        //TODO else SHOW CONTENTS   
+            
+    }
+
     public final void setMyName(String name)  { model.setMyName(name); }
     public final void setOppName(String name) { model.setOppName(name); }
-    public final void setMyColor(int color)   { model.setColor(color); }
+    public final void setMyColor(int color)   
+    { 
+        model.setColor(color); 
+        if(model.getColor() == Game.COLOR_WHITE) { model.slots = leftSlots; model.pics = leftPics; }
+        else { model.slots = rightSlots; model.pics = rightPics; }
+    }
 
     synchronized public void setHand(String in)
     {

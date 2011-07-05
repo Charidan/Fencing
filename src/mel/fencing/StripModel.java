@@ -1,5 +1,8 @@
 package mel.fencing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StripModel
 {
     public static final int STATE_SPLASH = 0;
@@ -70,15 +73,29 @@ public class StripModel
     private float dragOffsetX, dragOffsetY; // position of the touch relative to topLeft of the card
     private float dragPosX, dragPosY;       // position finger last detected at
     
-    public final boolean isDragging()      { return dragging; }
-    public final int getDragValue()     { return dragValue; }
+    public final boolean isDragging()     { return dragging; }
+    public final int getDragValue()       { return dragValue; }
     public final float getDragOffsetX()   { return dragOffsetX; }
     public final float getDragOffsetY()   { return dragOffsetY; }
-    public final float getDragPositionX()   { return dragPosX; }
-    public final float getDragPositionY()   { return dragPosY; }
+    public final float getDragPositionX() { return dragPosX; }
+    public final float getDragPositionY() { return dragPosY; }
     
-    public final void setDragging(boolean in)   { dragging = in; }
-    public final void setDragValue(int in)      { dragValue = in; }
-    public final void setDragOffset(float x, float y) { dragOffsetX = x; dragOffsetY = y; }
+    public final void setDragging(boolean in)           { dragging = in; }
+    public final void setDragValue(int in)              { dragValue = in; }
+    public final void setDragOffset(float x, float y)   { dragOffsetX = x; dragOffsetY = y; }
     public final void setDragPosition(float x, float y) { dragPosX = x; dragPosY = y; }
+    
+    private Card retreatCard = null;
+    private Card advanceCard = null;
+    private List<Card> attackList = new ArrayList<Card>();
+    int slots[];
+    String pics[];
+    
+    public Card getRetreatCard()        { return retreatCard; }
+    public Card getRightCard()          { return advanceCard; }
+    public List<Card> getAttackList()   { return attackList; }
+    
+    public void setRetreatCard(Card in) { retreatCard = in; }
+    public void setAdvanceCard(Card in) { advanceCard = in; }
+    public void addAttackCard(Card in)  { attackList.add(in); }
 }

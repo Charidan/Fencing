@@ -67,6 +67,7 @@ public class Fencing extends Activity
     private boolean loggedIn = false;
     private boolean tryingLogin = false;
     private boolean killed = false;
+    private boolean debug = false;
     
     static StripModel stripModel = new StripModel();
     
@@ -118,7 +119,8 @@ public class Fencing extends Activity
         switch (item.getItemId())
         {
             case R.id.newGame:
-                newGame();
+                if(debug) fakeGame();
+                else newGame();
                 return true;
             case R.id.conServer:
                 tryConnect();
@@ -131,6 +133,15 @@ public class Fencing extends Activity
         }
     }
     
+    private void fakeGame()
+    {
+        header.setText("");
+        footer.setText("");
+        stripView.startGame(Game.COLOR_WHITE, "FakeOpponent");
+        stripView.setHand("15324");
+        stripModel.setState(StripModel.STATE_GAME);
+    }
+
     private void tryConnect()
     {
         if(connected) disconnect();
