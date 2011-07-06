@@ -41,7 +41,6 @@ public class StripView extends View implements GameListener
     
     void init()
     {
-        //TODO set up paints
         textPaint = new Paint();
         textPaint.setColor(Color.GRAY);
         textPaint.setAntiAlias(true);
@@ -122,20 +121,28 @@ public class StripView extends View implements GameListener
         int slot = (int)(x/model.getCardStep());
         if(offsetX > model.getCardWidth()) return;
         
-        // TODO remove card from hand -- takeCard() instead of getCard()
-        Card card = model.getGame().getHand().getCard(slot);
+        Card card = model.getGame().getHand().takeCard(slot);
         if(card == null) return;
         
         model.setDragging(true);
-        model.setDragValue(card.getValue());
+        model.setDragCard(card);
         model.setDragOffset(offsetX, offsetY);
         model.setDragPosition(offsetX, offsetY);
     }
 
     private void abortDrag()
     {
-        // TODO return card to hand
-        model.setDragging(false);   
+        model.setDragging(false);
+        model.replaceCard(model.getDragCard());
+        model.setDragCard(null);
+        invalidate();
+    }
+    
+    private void stopDrag()
+    {
+        model.setDragging(false);
+        model.setDragCard(null);
+        invalidate();
     }
     
     private void tryDrop(float x, float y)
@@ -145,19 +152,22 @@ public class StripView extends View implements GameListener
         switch(slot)
         {
             //TODO check for legal moves
-            //TODO replace with reference to card taken from hand
+            //TODO remove test footer sets
             case SLOT_RETREAT:
-                model.setRetreatCard(new Card(model.getDragValue()));
-                model.setFooter("retreat: "+model.getDragValue());
+                model.setRetreatCard(model.getDragCard());
+                stopDrag();
+        model.setFooter("retreat: "+model.getDragValue());
             return;
             case SLOT_ADVANCE:
-                model.setAdvanceCard(new Card(model.getDragValue()));
-                model.setFooter("advance: "+model.getDragValue());
+                model.setAdvanceCard(model.getDragCard());
+                stopDrag();
+        model.setFooter("advance: "+model.getDragValue());
             return;
             case SLOT_ATTACK:
                 //TODO handle attack cards of different value
-                model.addAttackCard(new Card(model.getDragValue()));
-                model.setFooter("attack: "+model.getDragValue());
+                model.addAttackCard(model.getDragCard());
+                stopDrag();
+        model.setFooter("attack: "+model.getDragValue());
             return;
             case -1:
                 abortDrag();
@@ -277,12 +287,8 @@ public class StripView extends View implements GameListener
             if(c == null) continue;
             float cardX = cardLeft+cardStep*i;
             String value = c.toString();
-            cardPaint.getTextBounds(value, 0, value.length(), bounds);
-            textOffsetX = (cardWidth-bounds.width())/2;
-            textOffsetY = (cardHeight-bounds.height())/2;
-            
-            g.drawRect(cardX, cardTop, cardX+cardWidth, cardBottom, linePaint);
-            g.drawText(value, cardX+textOffsetX, cardTop+textOffsetY+bounds.height(), cardPaint);
+
+            renderCard(g, value, cardX, cardTop, cardWidth, cardHeight);
         }
         
         if(landscape)
@@ -398,13 +404,51 @@ public class StripView extends View implements GameListener
         
         g.drawRect(left, top, right, bottom, linePaint);
         
-        //TODO if(empty)
+        if(model.isSlotEmpty(slot))
+        {
+            //if the slot is empty, draw the slot picture
             cardPaint.getTextBounds(model.pics[slot], 0, model.pics[slot].length(), bounds);
             textOffsetY = (bottom-top-bounds.height())/2;
             textOffsetX = (right-left-bounds.width())/2;
             g.drawText(model.pics[slot], left+textOffsetX, top+textOffsetY+bounds.height(), cardPaint);
-        //TODO else SHOW CONTENTS   
+        }
+        else
+        {
+            Card c = null;
+            boolean isAttack = false;
+            switch(model.slots[slot])
+            {
+                case StripView.SLOT_RETREAT:
+                    c = model.getRetreatCard();
+                break;
+                case StripView.SLOT_ADVANCE:
+                    c = model.getAdvanceCard();
+                break;
+                case StripView.SLOT_ATTACK:
+                    c = model.getAttackList().get(0);
+                    isAttack = true;
+                break;
+            }
+            renderCard(g, c.toString(), left, top, right-left, bottom-top);
+            if(isAttack)
+            {
+                int count = model.getAttackList().size()-1;
+                //TODO draw extra cards in attackList
+            }
+        }
             
+    }
+    
+    private void renderCard(Canvas g, String value, float left, float top, float width, float height)
+    {
+        Rect bounds = new Rect();
+        cardPaint.getTextBounds(value, 0, value.length(), bounds);
+        float textOffsetX = (width-bounds.width())/2;
+        float textOffsetY = (height-bounds.height())/2;
+        float cardBottom = top+height;
+        
+        g.drawRect(left, top, left+width, cardBottom, linePaint);
+        g.drawText(value, left+textOffsetX, top+textOffsetY+bounds.height(), cardPaint);
     }
 
     public final void setMyName(String name)  { model.setMyName(name); }

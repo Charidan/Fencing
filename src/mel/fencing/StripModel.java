@@ -70,19 +70,20 @@ public class StripModel
     public final void setActionStep(float in)   { actionStep = in; }
     
     private boolean dragging;               // true when dragging a card
-    private int dragValue;                  // the number of the card being dragged
+    private Card dragCard;                  // the card being dragged
     private float dragOffsetX, dragOffsetY; // position of the touch relative to topLeft of the card
     private float dragPosX, dragPosY;       // position finger last detected at
     
     public final boolean isDragging()     { return dragging; }
-    public final int getDragValue()       { return dragValue; }
+    public final Card getDragCard()       { return dragCard; }
+    public final int getDragValue()       { return (dragCard == null) ? -1 : dragCard.getValue(); }
     public final float getDragOffsetX()   { return dragOffsetX; }
     public final float getDragOffsetY()   { return dragOffsetY; }
     public final float getDragPositionX() { return dragPosX; }
     public final float getDragPositionY() { return dragPosY; }
     
     public final void setDragging(boolean in)           { dragging = in; }
-    public final void setDragValue(int in)              { dragValue = in; }
+    public final void setDragCard(Card in)              { dragCard = in; }
     public final void setDragOffset(float x, float y)   { dragOffsetX = x; dragOffsetY = y; }
     public final void setDragPosition(float x, float y) { dragPosX = x; dragPosY = y; }
     
@@ -93,12 +94,48 @@ public class StripModel
     String pics[];
     
     public Card getRetreatCard()        { return retreatCard; }
-    public Card getRightCard()          { return advanceCard; }
+    public Card getAdvanceCard()          { return advanceCard; }
     public List<Card> getAttackList()   { return attackList; }
     
-    public void setRetreatCard(Card in) { retreatCard = in; }
-    public void setAdvanceCard(Card in) { advanceCard = in; }
-    public void addAttackCard(Card in)  { attackList.add(in); }
+    public void setRetreatCard(Card in)
+    {
+        if(retreatCard != null) replaceCard(retreatCard);
+        retreatCard = in;
+    }
+    
+    public void setAdvanceCard(Card in)
+    {
+        if(advanceCard != null) replaceCard(advanceCard);
+        advanceCard = in;
+    }
+    
+    public void addAttackCard(Card in)
+    {
+        if(!attackList.isEmpty() && attackList.get(0).getValue() != in.getValue())
+        {
+            while(!attackList.isEmpty()) replaceCard(attackList.remove(0));
+        }
+        attackList.add(in);
+    }
+    
+    public boolean isSlotEmpty(int in)
+    {
+        switch(slots[in])
+        {
+            case StripView.SLOT_RETREAT:
+                return retreatCard == null;
+            case StripView.SLOT_ADVANCE:
+                return advanceCard == null;
+            case StripView.SLOT_ATTACK:
+                return attackList.isEmpty();
+            default: return false;
+        }
+    }
+    
+    public void replaceCard(Card in)
+    {
+        game.getHand().replaceCard(in);
+    }
     
     TextView header;
     TextView footer;

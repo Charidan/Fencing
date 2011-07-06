@@ -39,6 +39,19 @@ public class Hand
             return null;
         }
     }
+    
+    public void replaceCard(Card in)
+    {
+        for(int i = 0; i < HAND_SIZE; i++)
+        {
+            if(card[i] == null)
+            {
+                card[i] = in;
+                return;
+            }
+        }
+    }
+    
     public void setHand(String in)
     {
         for(int i = 0; i < HAND_SIZE; i++)
