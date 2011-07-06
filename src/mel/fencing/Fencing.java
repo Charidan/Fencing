@@ -134,7 +134,7 @@ public class Fencing extends Activity
         stripModel.setHeader("");
         stripModel.setFooter("");
         stripView.startGame(Game.COLOR_WHITE, "FakeOpponent");
-        stripView.setHand("15324");
+        stripView.setHand("35313");
         stripModel.setState(StripModel.STATE_GAME);
     }
 

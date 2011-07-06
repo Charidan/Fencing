@@ -152,22 +152,18 @@ public class StripView extends View implements GameListener
         switch(slot)
         {
             //TODO check for legal moves
-            //TODO remove test footer sets
             case SLOT_RETREAT:
                 model.setRetreatCard(model.getDragCard());
                 stopDrag();
-        model.setFooter("retreat: "+model.getDragValue());
             return;
             case SLOT_ADVANCE:
                 model.setAdvanceCard(model.getDragCard());
                 stopDrag();
-        model.setFooter("advance: "+model.getDragValue());
             return;
             case SLOT_ATTACK:
                 //TODO handle attack cards of different value
                 model.addAttackCard(model.getDragCard());
                 stopDrag();
-        model.setFooter("attack: "+model.getDragValue());
             return;
             case -1:
                 abortDrag();
@@ -266,7 +262,7 @@ public class StripView extends View implements GameListener
         if(landscape)
         {
             cardTop = stripTop+fencer+2*MARGIN+bounds.height();
-            cardHeight = (height-cardTop-2*MARGIN_CARD-2*MARGIN)/2;
+            cardHeight = (height-cardTop-2*MARGIN_CARD-2*MARGIN-4*MARGIN_SHADOW)/2;
             cardWidth  = cardHeight*1000/1400;
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-6*cardStep-cardWidth)/2;
@@ -288,7 +284,7 @@ public class StripView extends View implements GameListener
             float cardX = cardLeft+cardStep*i;
             String value = c.toString();
 
-            renderCard(g, value, cardX, cardTop, cardWidth, cardHeight);
+            renderCard(g, value, 1, cardX, cardTop, cardWidth, cardHeight);
         }
         
         if(landscape)
@@ -296,15 +292,15 @@ public class StripView extends View implements GameListener
             goTop = cardTop;
             goBottom = cardBottom;
             goLeft = cardLeft + 5*cardStep + 2*MARGIN_CARD;
-            goRight = goLeft + 2*cardWidth;
+            goRight = goLeft + 2*cardStep;
             stopTop = goBottom + MARGIN_CARD;
-            stopBottom = stopTop + cardHeight + 2*MARGIN;
+            stopBottom = stopTop + cardHeight + 2*MARGIN + 4*MARGIN_SHADOW;
             stopLeft = goLeft;
             stopRight = goRight;
         } 
         else 
         {
-            goTop = cardBottom+2*MARGIN_CARD+cardHeight+2*MARGIN;
+            goTop = cardBottom+2*MARGIN_CARD+cardHeight+2*MARGIN+4*MARGIN_SHADOW;
             goBottom = goTop+cardHeight+2*MARGIN;
             goRight = width/2 - MARGIN_CARD/2;
             goLeft = MARGIN_CARD;
@@ -330,7 +326,7 @@ public class StripView extends View implements GameListener
         if(landscape)
         {
             actionTop = goBottom + MARGIN_CARD;
-            actionBottom = actionTop+cardHeight+2*MARGIN;
+            actionBottom = stopBottom;
             actionLeft = cardLeft;
             actionWidth = (cardStep*5-3*MARGIN_CARD)/3;
             actionStep = actionWidth+MARGIN_CARD;
@@ -338,7 +334,7 @@ public class StripView extends View implements GameListener
         else
         {
             actionTop = cardBottom+MARGIN_CARD;
-            actionBottom = actionTop+cardHeight+2*MARGIN;
+            actionBottom = actionTop+cardHeight+2*MARGIN+4*MARGIN_SHADOW;
             actionLeft = cardLeft;
             actionWidth = (cardStep*5-3*MARGIN_CARD)/3;
             actionStep = actionWidth+MARGIN_CARD;
@@ -415,7 +411,7 @@ public class StripView extends View implements GameListener
         else
         {
             Card c = null;
-            boolean isAttack = false;
+            int shadowCount = 0;
             switch(model.slots[slot])
             {
                 case StripView.SLOT_RETREAT:
@@ -426,7 +422,7 @@ public class StripView extends View implements GameListener
                 break;
                 case StripView.SLOT_ATTACK:
                     c = model.getAttackList().get(0);
-                    isAttack = true;
+                    shadowCount = model.getAttackList().size();
                 break;
             }
             
@@ -435,18 +431,16 @@ public class StripView extends View implements GameListener
             float cardLeft = left+(actionWidth-model.getCardWidth())/2;
             float cardTop = top+(actionHeight-model.getCardHeight())/2;
             
-            renderCard(g, c.toString(), cardLeft, cardTop, model.getCardWidth(), model.getCardHeight());
-            if(isAttack)
-            {
-                int count = model.getAttackList().size()-1;
-                //TODO draw extra cards in attackList
-            }
+            renderCard(g, c.toString(), shadowCount, cardLeft, cardTop, model.getCardWidth(), model.getCardHeight());
         }
             
     }
     
-    private void renderCard(Canvas g, String value, float left, float top, float width, float height)
+    private static final int MARGIN_SHADOW = 5;
+    private void renderCard(Canvas g, String value, int cardCount, float left, float top, float width, float height)
     {
+        top += (cardCount-1)*MARGIN_SHADOW/2;
+        left -= (cardCount-1)*MARGIN_SHADOW/2;
         Rect bounds = new Rect();
         cardPaint.getTextBounds(value, 0, value.length(), bounds);
         float textOffsetX = (width-bounds.width())/2;
@@ -455,6 +449,19 @@ public class StripView extends View implements GameListener
         
         g.drawRect(left, top, left+width, cardBottom, linePaint);
         g.drawText(value, left+textOffsetX, top+textOffsetY+bounds.height(), cardPaint);
+        
+        for(int i=1; i<cardCount; i++) 
+        {
+            float offset = i*MARGIN_SHADOW;
+            float shadowTop = top-offset;
+            float shadowLeft = left+offset;
+            float shadowRight = shadowLeft+width;
+            float shadowBottom = shadowTop+height;
+            g.drawLine(shadowLeft, shadowTop, shadowLeft, shadowTop+MARGIN_SHADOW, linePaint);
+            g.drawLine(shadowLeft, shadowTop, shadowRight, shadowTop, linePaint);
+            g.drawLine(shadowRight, shadowTop, shadowRight, shadowBottom, linePaint);
+            g.drawLine(shadowRight-MARGIN_SHADOW, shadowBottom, shadowRight, shadowBottom, linePaint);
+        }
     }
 
     public final void setMyName(String name)  { model.setMyName(name); }

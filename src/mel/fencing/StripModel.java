@@ -100,17 +100,24 @@ public class StripModel
     public void setRetreatCard(Card in)
     {
         if(retreatCard != null) replaceCard(retreatCard);
+        if(advanceCard != null) replaceCard(advanceCard);
+        while(!attackList.isEmpty()) replaceCard(attackList.remove(0));
         retreatCard = in;
+        advanceCard = null;
     }
     
     public void setAdvanceCard(Card in)
     {
+        if(retreatCard != null) replaceCard(retreatCard);
         if(advanceCard != null) replaceCard(advanceCard);
         advanceCard = in;
+        retreatCard = null;
     }
     
     public void addAttackCard(Card in)
     {
+        if(retreatCard != null) replaceCard(retreatCard);
+        retreatCard = null;
         if(!attackList.isEmpty() && attackList.get(0).getValue() != in.getValue())
         {
             while(!attackList.isEmpty()) replaceCard(attackList.remove(0));
