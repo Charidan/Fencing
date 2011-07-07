@@ -125,6 +125,15 @@ public class StripModel
         attackList.add(in);
     }
     
+    public void clearActions()
+    {
+        if(retreatCard != null) replaceCard(retreatCard);
+        if(advanceCard != null) replaceCard(advanceCard);
+        retreatCard = null;
+        advanceCard = null;
+        while(!attackList.isEmpty()) replaceCard(attackList.remove(0));
+    }
+    
     public boolean isSlotEmpty(int in)
     {
         switch(slots[in])
@@ -146,14 +155,52 @@ public class StripModel
     
     TextView header;
     TextView footer;
+    private String headerString = "";
+    private String footerString = "";
     
     public void setHeader(String in)
     {
+        headerString = in;
         header.setText(in);
     }
     
     public void setFooter(String in)
     {
+        footerString = in;
         footer.setText(in);
+    }
+    
+    public void refreshText()
+    {
+        footer.setText(footerString);
+        header.setText(headerString);
+    }
+    
+    private float downX = -1;
+    private float downY = -1;
+    public void setDown(float x, float y)
+    {
+        downX = x;
+        downY = y;
+    }
+    public float getDownX() { return downX; }
+    public float getDownY() { return downY; }
+    
+    public boolean isGoClick(float x, float y)
+    {
+        return
+            x > goLeft && x < goRight && 
+            y > goTop && y < goBottom &&
+            downX > goLeft && downX < goRight && 
+            downY > goTop && downY < goBottom;
+    }
+    
+    public boolean isStopClick(float x, float y)
+    {
+        return
+        x > stopLeft && x < stopRight && 
+        y > stopTop && y < stopBottom &&
+        downX > stopLeft && downX < stopRight && 
+        downY > stopTop && downY < stopBottom;
     }
 }

@@ -83,6 +83,8 @@ public class StripView extends View implements GameListener
     {
         super.onMeasure(x, y);
         landscape = x>y;
+        resetModel();
+        model.refreshText();
     }
     
     @Override
@@ -97,6 +99,7 @@ public class StripView extends View implements GameListener
             case MotionEvent.ACTION_DOWN:
                 if(model.isDragging()) abortDrag();
                 tryGrab(e.getX(), e.getY());
+                model.setDown(e.getX(), e.getY());
             break;
             
             case MotionEvent.ACTION_MOVE:
@@ -105,6 +108,7 @@ public class StripView extends View implements GameListener
             
             case MotionEvent.ACTION_UP:
                 if(model.isDragging()) tryDrop(e.getX(), e.getY());
+                tryClick(e.getX(), e.getY());
             break;
         }
         // opaque to touch
@@ -128,6 +132,37 @@ public class StripView extends View implements GameListener
         model.setDragCard(card);
         model.setDragOffset(offsetX, offsetY);
         model.setDragPosition(offsetX, offsetY);
+    }
+    
+    /**
+     * must be called from GUI thread
+     */
+    private void tryClick(float x, float y)
+    {
+        // TODO RFE if each clickable had an object that implemented a standard interface (like View or even just BoundaryRectangle)
+        // we could just loop through the list of clickables instead of writing a different boundary check for each
+        // since there are only two buttons in our GUI, we can ignore that for now
+        if(model.isGoClick(x, y)) clickGo();
+        else if (model.isStopClick(x, y)) clickStop();
+    }
+    
+    /**
+     * must be called from GUI thread
+     */
+    private void clickGo()
+    {
+        // TODO implement go button action
+        model.setHeader("Go Hit");
+        model.setFooter("");
+    }
+    
+    /**
+     * must be called from GUI thread
+     */
+    private void clickStop()
+    {
+        model.clearActions();
+        invalidate();
     }
 
     private void abortDrag()
@@ -161,7 +196,6 @@ public class StripView extends View implements GameListener
                 stopDrag();
             return;
             case SLOT_ATTACK:
-                //TODO handle attack cards of different value
                 model.addAttackCard(model.getDragCard());
                 stopDrag();
             return;
