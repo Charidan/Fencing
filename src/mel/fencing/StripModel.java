@@ -22,6 +22,7 @@ public class StripModel
     
     public final Game getGame()             { return game; }
     public final int getColor()             { return color; }
+    public final int getTurn()              { return game.getTurn(); }
     public final String getMyName()         { return myName; }
     public final String getOppName()        { return oppName; }
     public final int getState()             { return state; }

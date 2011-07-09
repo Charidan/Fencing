@@ -36,7 +36,6 @@ public class StripView extends View implements GameListener
     public StripView(Context context, AttributeSet attr)
     {
         super(context, attr);
-        init();
     }
     
     void init()
@@ -152,8 +151,72 @@ public class StripView extends View implements GameListener
     private void clickGo()
     {
         // TODO implement go button action
-        model.setHeader("Go Hit");
-        model.setFooter("");
+        String retreatValue = model.getRetreatCard() == null ? "*" : model.getRetreatCard().toString();
+        String advanceValue = model.getAdvanceCard() == null ? "*" : model.getAdvanceCard().toString();
+        String attackValue = model.getAttackList().isEmpty() ? "*" : model.getAttackList().get(0).toString();
+        String attackCount = ""+model.getAttackList().size();
+        
+        //If it's my turn to parry
+        if(model.getTurn() == Game.TURN_WHITE_PARRY && model.getColor() == Game.COLOR_WHITE ||
+           model.getTurn() == Game.TURN_BLACK_PARRY && model.getColor() == Game.COLOR_BLACK)
+        {
+            if(!retreatValue.equals("*"))
+            {   
+                //TODO forbid dodging a standing attack
+                //dodge attack
+                send("r"+retreatValue);
+                return;
+            }
+            if(!attackValue.equals("*"))
+            {
+                //parry attack
+                send("q");
+                return;
+            }
+            //if fail to parry/dodge
+            model.setHeader("You must parry or avoid the incoming attack");
+            return;
+        }
+        
+        //if it's not your turn
+        if(model.getColor() == Game.COLOR_WHITE && model.getTurn() == Game.TURN_BLACK_MOVE ||
+           model.getColor() == Game.COLOR_BLACK && model.getTurn() == Game.TURN_WHITE_MOVE)
+        {
+            model.setHeader("Not your turn");
+            return;
+        }
+        
+        //Retreat (but not to dodge a parry)
+        if(!retreatValue.equals("*"))
+        {
+            send("r"+retreatValue);
+            return;
+        }
+        
+        //advance options
+        if(!advanceValue.equals("*"))
+        {
+            if(!attackValue.equals("*"))
+            {
+                //patenandu
+                send("p"+advanceValue+attackValue+attackCount);
+                return;
+            } else
+            {
+                //normal advance
+                send("m"+advanceValue);
+                return;
+            }
+        } 
+        
+        //standing attack
+        if(!attackValue.equals("*"))
+        {
+            send("a"+attackValue+attackCount);
+            return;
+        }
+        
+        model.setHeader("Illegal move submission");
     }
     
     /**
@@ -517,5 +580,10 @@ public class StripView extends View implements GameListener
     public void gameChanged()
     {
         postInvalidate();
+    }
+    
+    private void send(String in)
+    {
+        Fencing.getSingleton().send(in);
     }
 }

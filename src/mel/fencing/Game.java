@@ -34,6 +34,7 @@ public class Game
     public int getWhitepos() { return whitepos; }
     public int getBlackpos() { return blackpos; }
     public Hand getHand() { return hand; }
+    public int getTurn() { return turn; }
 
     public void setHand(String in)
     {

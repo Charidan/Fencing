@@ -68,6 +68,8 @@ public class Fencing extends Activity
     static StripModel stripModel = new StripModel();
     
     private HashMap<Character,Command> opcode2Command = new HashMap<Character,Command>();
+    private static Fencing singleton;
+    
     
     public Fencing()
     {
@@ -81,7 +83,10 @@ public class Fencing extends Activity
         registerCommand('b', new NewGameCommand(Game.COLOR_BLACK));
         registerCommand('w', new NewGameCommand(Game.COLOR_WHITE));
         registerCommand('h', new SetHandCommand());
+        singleton = this;
     }
+    
+    public static Fencing getSingleton() { return singleton; }
     
     private void registerCommand(Character opcode, Command command)
     {
