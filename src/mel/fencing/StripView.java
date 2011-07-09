@@ -573,6 +573,7 @@ public class StripView extends View implements GameListener
     synchronized public void setHand(String in)
     {
         resetModel();
+        model.clearActions();
         model.getGame().setHand(in);
     }
 
