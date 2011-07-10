@@ -1,6 +1,8 @@
 package mel.fencing;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class Game
@@ -19,7 +21,7 @@ public class Game
     public static final int TURN_WHITE_PARRY_OR_RETREAT =   COLOR_WHITE+TURN_PARRY_OR_RETREAT; 
     public static final int TURN_GAME_OVER = -1;
     
-    private List<GameListener> listeners = new ArrayList<GameListener>();
+    private Collection<GameListener> listeners = new HashSet<GameListener>();
     
     Hand hand = new Hand();
     int blackHP = 5;
@@ -55,5 +57,17 @@ public class Game
     public void fireGameChanged()
     {
         for(GameListener gl : listeners) gl.gameChanged();
+    }
+
+    public void setPositions(String in)
+    {
+        whitepos = parsePos(in.charAt(0));
+        blackpos = parsePos(in.charAt(1));
+        fireGameChanged();
+    }
+    
+    private static final int parsePos(char in)
+    {
+        return in-'a'+1;
     }
 }

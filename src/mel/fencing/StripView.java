@@ -36,6 +36,7 @@ public class StripView extends View implements GameListener
     public StripView(Context context, AttributeSet attr)
     {
         super(context, attr);
+        init();
     }
     
     void init()
@@ -69,7 +70,7 @@ public class StripView extends View implements GameListener
         cardPaint.setStyle(Style.STROKE);
     }
     
-    private void resetModel() { model = Fencing.stripModel; }
+    private void resetModel() { model = Fencing.stripModel; model.getGame().addListener(this); }
     
     public void startGame(int color, String oppName)
     {
@@ -586,5 +587,11 @@ public class StripView extends View implements GameListener
     private void send(String in)
     {
         Fencing.getSingleton().send(in);
+    }
+
+    public void setPositions(String in)
+    {
+        resetModel();
+        model.getGame().setPositions(in);
     }
 }
