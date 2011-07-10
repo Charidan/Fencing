@@ -5,14 +5,19 @@ import java.util.List;
 
 public class Game
 {
-    public static final int TURN_BLACK_MOVE = 0;
-    public static final int TURN_BLACK_PARRY = 1;
-    public static final int TURN_WHITE_MOVE = 2;
-    public static final int TURN_WHITE_PARRY = 3;
-    public static final int TURN_GAME_OVER = 4;
-    public static final int COLOR_NONE = 0;
-    public static final int COLOR_WHITE = 1;
-    public static final int COLOR_BLACK = 2;
+    public static final int COLOR_NONE = -10;
+    public static final int COLOR_WHITE = 0;
+    public static final int COLOR_BLACK = 10;
+    public static final int TURN_MOVE = 0;
+    public static final int TURN_PARRY = 1;
+    public static final int TURN_PARRY_OR_RETREAT = 2;
+    public static final int TURN_BLACK_MOVE =               COLOR_BLACK+TURN_MOVE;
+    public static final int TURN_BLACK_PARRY =              COLOR_BLACK+TURN_PARRY;
+    public static final int TURN_BLACK_PARRY_OR_RETREAT =   COLOR_BLACK+TURN_PARRY_OR_RETREAT; 
+    public static final int TURN_WHITE_MOVE =               COLOR_WHITE+TURN_MOVE;
+    public static final int TURN_WHITE_PARRY =              COLOR_WHITE+TURN_PARRY;
+    public static final int TURN_WHITE_PARRY_OR_RETREAT =   COLOR_WHITE+TURN_PARRY_OR_RETREAT; 
+    public static final int TURN_GAME_OVER = -1;
     
     private List<GameListener> listeners = new ArrayList<GameListener>();
     
