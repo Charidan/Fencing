@@ -594,4 +594,17 @@ public class StripView extends View implements GameListener
         resetModel();
         model.getGame().setPositions(in);
     }
+    
+    public void setTurn(String in)
+    {
+        resetModel();
+        try
+        {
+            model.getGame().setTurn(Integer.parseInt(in));
+        }
+        catch(NumberFormatException e)
+        {
+            model.setFooter("Garbled turn number from server: "+in);
+        }
+    }
 }

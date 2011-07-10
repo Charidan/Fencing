@@ -70,4 +70,10 @@ public class Game
     {
         return in-'a'+1;
     }
+
+    public void setTurn(int turn)
+    {
+        this.turn = turn;
+        fireGameChanged();
+    }
 }

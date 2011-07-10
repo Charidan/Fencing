@@ -84,6 +84,7 @@ public class Fencing extends Activity
         registerCommand('w', new NewGameCommand(Game.COLOR_WHITE));
         registerCommand('h', new SetHandCommand());
         registerCommand('x', new PositionCommand());
+        registerCommand('t', new TurnCommand());
         singleton = this;
     }
     
@@ -658,6 +659,15 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             stripView.setPositions(in);
+        }
+    }
+    
+    private class TurnCommand implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            stripView.setTurn(in);
         }
     }
 }
