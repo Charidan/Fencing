@@ -204,4 +204,19 @@ public class StripModel
         downX > stopLeft && downX < stopRight && 
         downY > stopTop && downY < stopBottom;
     }
+    
+    private int parryValue = -1;
+    private int parryCount = -1;
+    private boolean mayRetreat = false;
+    
+    public void setParry(int value, int count, boolean mayRetreat)
+    {
+        parryValue = value;
+        parryCount = count;
+        this.mayRetreat = mayRetreat;
+    }
+    
+    public boolean mayRetreat() { return mayRetreat; }
+    public int getParryValue() { return parryValue; }
+    public int getParryCount() { return parryCount; }
 }

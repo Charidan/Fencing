@@ -85,6 +85,8 @@ public class Fencing extends Activity
         registerCommand('h', new SetHandCommand());
         registerCommand('x', new PositionCommand());
         registerCommand('t', new TurnCommand());
+        registerCommand('q', new ParryNotice());
+        registerCommand('a', new AttackNotice());
         singleton = this;
     }
     
@@ -667,7 +669,34 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
+            //TODO show the attack cards in the footer inside this methos (they will be in the model)
             stripView.setTurn(in);
         }
+    }
+    
+    private class ParryNotice implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            stripModel.setHeader("Parry");
+            stripModel.setFooter("Played "+stripModel.getParryCount()+" "+stripModel.getParryValue()+"s");
+        }
+    }
+    
+    private class AttackNotice implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            if(in.length() != 3) stripModel.setFooter("syntax error");
+            stripModel.setParry(parseDigit(in.charAt(0)),parseDigit(in.charAt(1)),(in.charAt(2)=='t')?true:false);
+        }
+    }
+    
+    static private final int parseDigit(char in)
+    {
+        if(in<'0' || in > '9') return -1;
+        return in-'0';
     }
 }
