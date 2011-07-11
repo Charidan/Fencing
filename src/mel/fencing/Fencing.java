@@ -54,16 +54,16 @@ public class Fencing extends Activity
     
     boolean refresh = false;
     
-    private BufferedReader in;
-    private PrintStream out;
+    private static BufferedReader in;
+    private static PrintStream out;
     
-    private String username = "<empty>";
-    private String password = "<empty>";
-    private boolean connected = false;
-    private boolean loggedIn = false;
-    private boolean tryingLogin = false;
-    private boolean killed = false;
-    private boolean debug = false;
+    private static String username = "<empty>";
+    private static String password = "<empty>";
+    private static boolean connected = false;
+    private static boolean loggedIn = false;
+    private static boolean tryingLogin = false;
+    private static boolean killed = false;
+    private static boolean debug = false;
     
     static StripModel stripModel = new StripModel();
     
