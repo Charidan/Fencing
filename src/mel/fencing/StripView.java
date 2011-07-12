@@ -76,6 +76,7 @@ public class StripView extends View implements GameListener
     {
         setOppName(oppName);
         setMyColor(color);
+        model.getGame().reset();
     }
     
     @Override
@@ -151,70 +152,102 @@ public class StripView extends View implements GameListener
      */
     private void clickGo()
     {
-        // TODO implement go button action
+        int turn = model.getTurn();
+        // if it's not your turn
+        switch(turn)
+        {
+            case Game.TURN_BLACK_MOVE: 
+            case Game.TURN_BLACK_PARRY:
+            case Game.TURN_BLACK_PARRY_OR_RETREAT:
+                if(model.getColor() == Game.COLOR_WHITE) { model.setHeader("Please wait your turn"); return; }
+            break;
+            
+            case Game.TURN_WHITE_MOVE:
+            case Game.TURN_WHITE_PARRY:
+            case Game.TURN_WHITE_PARRY_OR_RETREAT:
+                if(model.getColor() == Game.COLOR_BLACK) { model.setHeader("Please wait your turn"); return; }
+            break;
+        }
+        
         String retreatValue = model.getRetreatCard() == null ? "*" : model.getRetreatCard().toString();
         String advanceValue = model.getAdvanceCard() == null ? "*" : model.getAdvanceCard().toString();
         String attackValue = model.getAttackList().isEmpty() ? "*" : model.getAttackList().get(0).toString();
         String attackCount = ""+model.getAttackList().size();
         
-        //If it's my turn to parry
-        if(model.getTurn() == Game.TURN_WHITE_PARRY && model.getColor() == Game.COLOR_WHITE ||
-           model.getTurn() == Game.TURN_BLACK_PARRY && model.getColor() == Game.COLOR_BLACK)
+        // this is a useless comment
+        if(turn == Game.TURN_WHITE_MOVE || turn == Game.TURN_BLACK_MOVE)
         {
+            //advance options
+            if(!advanceValue.equals("*"))
+            {
+                if(!attackValue.equals("*"))
+                {
+                    //patenandu
+                    send("p"+advanceValue+attackValue+attackCount);
+                    return;
+                } else
+                {
+                    //normal advance
+                    send("m"+advanceValue);
+                    return;
+                }
+            } 
+            
             if(!retreatValue.equals("*"))
             {   
-                //TODO forbid dodging a standing attack
-                //dodge attack
+                //retreat
                 send("r"+retreatValue);
                 return;
             }
-            if(!attackValue.equals("*"))
+        }
+        
+        if(turn == Game.TURN_WHITE_PARRY || turn == Game.TURN_BLACK_PARRY)
+        {
+            // parry attack
+            if (model.getAttackList().size() == model.getParryCount() && 
+                model.getAttackList().get(0).getValue() == model.getParryValue())        
             {
-                //parry attack
+                if(!advanceValue.equals("*"))
+                {
+                    model.setHeader("Defend before advancing");
+                    return;
+                }
+                model.trashActions();
                 send("q");
                 return;
             }
-            //if fail to parry/dodge
-            model.setHeader("You must parry or avoid the incoming attack");
-            return;
-        }
-        
-        //if it's not your turn
-        if(model.getColor() == Game.COLOR_WHITE && model.getTurn() == Game.TURN_BLACK_MOVE ||
-           model.getColor() == Game.COLOR_BLACK && model.getTurn() == Game.TURN_WHITE_MOVE)
-        {
-            model.setHeader("Not your turn");
-            return;
-        }
-        
-        //Retreat (but not to dodge a parry)
-        if(!retreatValue.equals("*"))
-        {
-            send("r"+retreatValue);
-            return;
-        }
-        
-        //advance options
-        if(!advanceValue.equals("*"))
-        {
-            if(!attackValue.equals("*"))
+            else
             {
-                //patenandu
-                send("p"+advanceValue+attackValue+attackCount);
-                return;
-            } else
-            {
-                //normal advance
-                send("m"+advanceValue);
+                model.setHeader("Wrong cards for parry");
                 return;
             }
-        } 
+        }
         
-        //standing attack
-        if(!attackValue.equals("*"))
+        if(turn == Game.TURN_WHITE_PARRY_OR_RETREAT || turn == Game.TURN_BLACK_PARRY_OR_RETREAT)
         {
-            send("a"+attackValue+attackCount);
-            return;
+            if(!retreatValue.equals("*"))
+            {   
+                //retreat
+                send("r"+retreatValue);
+                return;
+            }
+            if (model.getAttackList().size() == model.getParryCount() && 
+                model.getAttackList().get(0).getValue() == model.getParryValue())        
+            {
+                if (!advanceValue.equals("*"))
+                {
+                    model.setHeader("Defend before advancing");
+                    return;
+                }
+                model.trashActions();
+                send("q");
+                return;
+            }
+            else
+            {
+                model.setHeader("Wrong cards for parry");
+                return;
+            }
         }
         
         model.setHeader("Illegal move submission");
@@ -226,6 +259,8 @@ public class StripView extends View implements GameListener
     private void clickStop()
     {
         model.clearActions();
+        model.displayLastAction();
+        model.displayNextChoice();
         invalidate();
     }
 
@@ -581,6 +616,8 @@ public class StripView extends View implements GameListener
     @Override
     public void gameChanged()
     {
+        model.displayLastAction();
+        model.displayNextChoice();
         postInvalidate();
     }
     

@@ -135,6 +135,13 @@ public class StripModel
         while(!attackList.isEmpty()) replaceCard(attackList.remove(0));
     }
     
+    public void trashActions()
+    {
+        retreatCard = null;
+        advanceCard = null;
+        attackList.clear();
+    }
+    
     public boolean isSlotEmpty(int in)
     {
         switch(slots[in])
@@ -205,18 +212,133 @@ public class StripModel
         downY > stopTop && downY < stopBottom;
     }
     
+    public static final int ACTION_NONE = -1;
+    public static final int ACTION_MOVE = 0;
+    public static final int ACTION_ATTACK = 1;
+    public static final int ACTION_PAT = 2;
+    public static final int ACTION_PARRY = 3;
+    public static final int ACTION_RETREAT = 4;
+    
     private int parryValue = -1;
     private int parryCount = -1;
     private boolean mayRetreat = false;
+    private int distance = -1;
+    private int lastAction = ACTION_NONE;
     
-    public void setParry(int value, int count, boolean mayRetreat)
+    public void setParryDone()
+    {
+        lastAction = ACTION_PARRY;
+    }
+    
+    public void setParryNeeded(int value, int count, int distance)
     {
         parryValue = value;
         parryCount = count;
-        this.mayRetreat = mayRetreat;
+        this.distance = distance;
+        mayRetreat = (distance != 0);
+        if(mayRetreat) lastAction = ACTION_PAT;
+        else lastAction = ACTION_ATTACK;
+    }
+    
+    public void setMove(int distance)
+    {
+        this.distance = distance;
+        lastAction = ACTION_MOVE;
+    }
+    
+    public void setRetreat(int distance)
+    {
+        this.distance = distance;
+        lastAction = ACTION_RETREAT;
+    }
+    
+    public void displayLastAction()
+    {
+        String actor = (getLastActor() == Game.COLOR_BLACK) ? "Black" : "White";
+        switch(lastAction)
+        {
+            case ACTION_MOVE:
+                setHeader(actor+" moved "+distance);
+            break;
+            case ACTION_RETREAT:
+                setHeader(actor+" retreated "+distance);
+            break;
+            case ACTION_PARRY:
+                setHeader(actor+" parried "+parryCount+" "+parryValue+"s");
+            break;
+            case ACTION_ATTACK:
+                setHeader(actor+" attacked with "+attackStr());
+            break;
+            case ACTION_PAT:
+                setHeader(actor+" jumped "+distance+" and attacked with "+attackStr());
+            break;
+        }
+    }
+    
+    public void displayNextChoice()
+    {
+        switch(game.getTurn())
+        {
+            case Game.TURN_BLACK_MOVE:
+                setFooter("Black's turn to move");
+            break;
+            case Game.TURN_BLACK_PARRY:
+                setFooter("Black must parry");
+            break;
+            case Game.TURN_BLACK_PARRY_OR_RETREAT:
+                setFooter("Black must parry or retreat");
+            break;
+            case Game.TURN_WHITE_MOVE:
+                setFooter("White's turn to move");
+            break;
+            case Game.TURN_WHITE_PARRY:
+                setFooter("White must parry");
+            break;
+            case Game.TURN_WHITE_PARRY_OR_RETREAT:
+                setFooter("White must parry or retreat");
+            break;
+        }
+    }
+    
+    private String attackStr()
+    {
+        switch(parryCount)
+        {
+            case 1:
+                return "a "+parryValue;
+            case 2:
+                return "a pair of "+parryValue+"s";
+            case 3:
+                return "triple "+parryValue+"s";
+            case 4:
+                return "four "+parryValue+"s";
+            case 5:
+                return "five "+parryValue+"s";
+            default: return "nothing";
+        }
     }
     
     public boolean mayRetreat() { return mayRetreat; }
     public int getParryValue() { return parryValue; }
     public int getParryCount() { return parryCount; }
+    public int getDistance() { return distance; }
+    public int getLastAction() { return lastAction; }
+    
+    public int getLastActor()
+    {
+        switch(game.getTurn())
+        {
+            case Game.TURN_BLACK_PARRY:
+            case Game.TURN_BLACK_PARRY_OR_RETREAT:
+                return Game.COLOR_WHITE;
+            case Game.TURN_BLACK_MOVE:
+                return (lastAction == ACTION_PARRY) ? Game.COLOR_BLACK : Game.COLOR_WHITE;
+            case Game.TURN_WHITE_PARRY:
+            case Game.TURN_WHITE_PARRY_OR_RETREAT:
+                return Game.COLOR_BLACK;
+            case Game.TURN_WHITE_MOVE:
+                return (lastAction == ACTION_PARRY) ? Game.COLOR_WHITE : Game.COLOR_BLACK;
+        }
+        return Game.COLOR_NONE;
+    }
 }

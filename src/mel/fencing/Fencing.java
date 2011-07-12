@@ -87,6 +87,8 @@ public class Fencing extends Activity
         registerCommand('t', new TurnCommand());
         registerCommand('q', new ParryNotice());
         registerCommand('a', new AttackNotice());
+        registerCommand('m', new MoveNotice());
+        registerCommand('r', new RetreatNotice());
         singleton = this;
     }
     
@@ -555,7 +557,6 @@ public class Fencing extends Activity
                     stripModel.setFooter(ex.getMessage());
                 break;
                 case MESSAGE_COMMAND:
-                    stripModel.setHeader("Command Received");
                     String s = (String) m.obj;
                     if(s == null || s.length()<1) return; // ignore empty messages
                     Command c = opcode2Command.get(s.charAt(0));
@@ -679,8 +680,7 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
-            stripModel.setHeader("Parry");
-            stripModel.setFooter("Played "+stripModel.getParryCount()+" "+stripModel.getParryValue()+"s");
+            stripModel.setParryDone();
         }
     }
     
@@ -690,7 +690,27 @@ public class Fencing extends Activity
         public void execute(String in)
         {
             if(in.length() != 3) stripModel.setFooter("syntax error");
-            stripModel.setParry(parseDigit(in.charAt(0)),parseDigit(in.charAt(1)),(in.charAt(2)=='t')?true:false);
+            stripModel.setParryNeeded(parseDigit(in.charAt(0)),parseDigit(in.charAt(1)),parseDigit(in.charAt(2)));
+        }
+    }
+    
+    private class MoveNotice implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            if(in.length() != 1) stripModel.setFooter("syntax error");
+            stripModel.setMove(parseDigit(in.charAt(0)));
+        }
+    }
+    
+    private class RetreatNotice implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            if(in.length() != 1) stripModel.setFooter("syntax error");
+            stripModel.setRetreat(parseDigit(in.charAt(0)));
         }
     }
     
