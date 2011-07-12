@@ -193,6 +193,13 @@ public class StripView extends View implements GameListener
                 }
             } 
             
+            if(!attackValue.equals("*"))
+            {
+                //standing attack
+                send("a"+attackValue+attackCount);
+                return;
+            }
+            
             if(!retreatValue.equals("*"))
             {   
                 //retreat
