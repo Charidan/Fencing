@@ -297,6 +297,9 @@ public class StripModel
             case Game.TURN_WHITE_PARRY_OR_RETREAT:
                 setFooter("White must parry or retreat");
             break;
+            case Game.TURN_GAME_OVER:
+                setFooter(getGameOverClause());
+            break;
         }
     }
     
@@ -316,6 +319,53 @@ public class StripModel
                 return "five "+parryValue+"s";
             default: return "nothing";
         }
+    }
+    
+    private int victor;
+    private char endCause;
+    
+    public void setVictor(int color)
+    {
+        victor = color;
+    }
+    
+    public int getVictor() { return victor; }
+    
+    public void setEndCause(char opcode)
+    {
+        endCause = opcode;
+    }
+    
+    public char getEndCause() { return endCause; }
+    
+    private String getGameOverClause()
+    {
+        if(victor == Game.COLOR_NONE)
+        {
+            return "The game ended in a tie";
+        }
+        
+        String win = (victor == Game.COLOR_BLACK) ? "Black" : "White";
+        String lose = (victor == Game.COLOR_BLACK) ? "white" : "black";
+        
+        String fails = "";
+        switch(endCause)
+        {
+            case '0':
+                fails = " has backed off the strip";
+            break;
+            case '1':
+                fails = " could not parry the standing attack";
+            break;
+            case '2':
+                fails = " the deck emptied. "+win+" had more cards at final distance";
+            break;
+            case '3':
+                fails = " the deck emptied. "+win+" had the better final position";
+            break;
+        }
+        
+        return win+" wins because "+lose+fails;
     }
     
     public boolean mayRetreat() { return mayRetreat; }
@@ -340,5 +390,14 @@ public class StripModel
                 return (lastAction == ACTION_PARRY) ? Game.COLOR_WHITE : Game.COLOR_BLACK;
         }
         return Game.COLOR_NONE;
+    }
+    
+    private boolean finalParry = false;
+    
+    public boolean getFinalParry() { return finalParry; }
+    
+    public void setFinalParry(boolean b)
+    {
+        finalParry = b;
     }
 }

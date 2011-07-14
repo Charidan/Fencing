@@ -89,6 +89,10 @@ public class Fencing extends Activity
         registerCommand('a', new AttackNotice());
         registerCommand('m', new MoveNotice());
         registerCommand('r', new RetreatNotice());
+        registerCommand('f', new FinalParryNotice());
+        registerCommand('A', new EndGameNotice(Game.COLOR_WHITE));
+        registerCommand('B', new EndGameNotice(Game.COLOR_BLACK));
+        registerCommand('B', new EndGameNotice(Game.COLOR_NONE));
         singleton = this;
     }
     
@@ -711,6 +715,30 @@ public class Fencing extends Activity
         {
             if(in.length() != 1) stripModel.setFooter("syntax error");
             stripModel.setRetreat(parseDigit(in.charAt(0)));
+        }
+    }
+    
+    private class FinalParryNotice implements Command
+    {
+        @Override
+        public void execute(String in)
+        {
+            stripModel.setFinalParry(true);
+        }
+    }
+    
+    private class EndGameNotice implements Command
+    {
+        private int victor;
+        
+        EndGameNotice(int victorColor) { victor = victorColor; }
+        
+        @Override
+        public void execute(String in)
+        {
+            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
+            stripModel.setVictor(victor);
+            stripModel.setEndCause(in.charAt(0));
         }
     }
     
