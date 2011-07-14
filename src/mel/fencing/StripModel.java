@@ -348,24 +348,24 @@ public class StripModel
         String win = (victor == Game.COLOR_BLACK) ? "Black" : "White";
         String lose = (victor == Game.COLOR_BLACK) ? "white" : "black";
         
-        String fails = "";
+        String reason = "";
         switch(endCause)
         {
             case '0':
-                fails = " has backed off the strip";
+                reason = lose+" has backed off the strip";
             break;
             case '1':
-                fails = " could not parry the standing attack";
+                reason = lose+" could not parry the standing attack";
             break;
             case '2':
-                fails = " the deck emptied. "+win+" had more cards at final distance";
+                reason = " the deck emptied. "+win+" had more cards at final distance";
             break;
             case '3':
-                fails = " the deck emptied. "+win+" had the better final position";
+                reason = " the deck emptied. "+win+" had the better final position";
             break;
         }
         
-        return win+" wins because "+lose+fails;
+        return win+" wins because "+reason;
     }
     
     public boolean mayRetreat() { return mayRetreat; }
