@@ -352,20 +352,20 @@ public class StripModel
         switch(endCause)
         {
             case '0':
-                reason = lose+" has backed off the strip";
+                reason = win+" wins because "+lose+" has backed off the strip";
             break;
             case '1':
-                reason = lose+" could not parry the standing attack";
+                reason = win+" wins because "+lose+" could not parry";
             break;
             case '2':
-                reason = " the deck emptied. "+win+" had more cards at final distance";
+                reason = win+" wins with more "+(game.blackpos-game.whitepos)+"s";
             break;
             case '3':
-                reason = " the deck emptied. "+win+" had the better final position";
+                reason = win+" wins with the better final position";
             break;
         }
         
-        return win+" wins because "+reason;
+        return reason;
     }
     
     public boolean mayRetreat() { return mayRetreat; }
