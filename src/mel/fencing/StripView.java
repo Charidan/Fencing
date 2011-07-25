@@ -1,6 +1,8 @@
 package mel.fencing;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -338,7 +340,7 @@ public class StripView extends View implements GameListener
         
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
-        int step = (width-2*MARGIN)/23;
+        int step = (width-2*MARGIN)/23*FENCER_SMALL/FENCER_BIG;
         int startX = (width+1-step*23)/2;
         Rect bounds = new Rect();
         float textOffsetX, textOffsetY;
@@ -370,28 +372,38 @@ public class StripView extends View implements GameListener
         textPaint.getTextBounds(blackName, 0, blackName.length(), bounds);
         g.drawText(blackName, width-startX-bounds.width(), bounds.height()+MARGIN, textPaint);
         
-        int fencer = landscape ? FENCER_BIG : FENCER_SMALL;
+        int fencerSize = landscape ? FENCER_BIG : FENCER_BIG;
+        Bitmap fencerGreen, fencerPurple;
+        if(fencerSize == FENCER_BIG)
+        {
+            fencerGreen = BitmapFactory.decodeResource(getResources(), R.drawable.greenfencer34);
+            fencerPurple = BitmapFactory.decodeResource(getResources(), R.drawable.purpfencer34);
+        }
+        else
+        {
+            fencerGreen = BitmapFactory.decodeResource(getResources(), R.drawable.greenfencer20);
+            fencerPurple = BitmapFactory.decodeResource(getResources(), R.drawable.purpfencer20);
+        }
         
         //TODO RFE use a selector to remove the chance of accidental change to position
-        int stripTop = 2*MARGIN+bounds.height()+fencer;
+        int stripTop = 2*MARGIN+bounds.height()+fencerSize;
         int whiteX = startX+(model.getGame().whitepos-1)*step;
         int blackX = startX+(model.getGame().blackpos-1)*step;            
         
         //draw the strip
-        g.drawLine(startX, stripTop+fencer, startX+23*step, stripTop+fencer, linePaint);
+        g.drawLine(startX, stripTop+fencerSize, startX+23*step, stripTop+fencerSize, linePaint);
         //draw the fencers
-        //TODO replace with bitmaps
-        g.drawRect(whiteX, stripTop, whiteX+fencer, stripTop+fencer, whitePaint);
-        g.drawRect(blackX, stripTop, blackX+fencer, stripTop+fencer, blackPaint);
+        g.drawBitmap(fencerGreen, whiteX, stripTop, linePaint);
+        g.drawBitmap(fencerPurple, blackX, stripTop, linePaint);
         
         //draw position numbers
-        int posTop = stripTop+fencer+MARGIN;
+        int posTop = stripTop+fencerSize+MARGIN;
         String whitepos = ""+model.getGame().getWhitepos();
         String blackpos = ""+model.getGame().getBlackpos();
         textPaint.getTextBounds(whitepos, 0, whitepos.length(), bounds);
-        g.drawText(whitepos, whiteX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        g.drawText(whitepos, whiteX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
         textPaint.getTextBounds(blackpos, 0, blackpos.length(), bounds);
-        g.drawText(blackpos, blackX+(fencer-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        g.drawText(blackpos, blackX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
         
         //draw buttons and cards
         float cardWidth,cardHeight,cardTop,cardBottom,cardLeft,cardStep;
@@ -401,7 +413,7 @@ public class StripView extends View implements GameListener
         
         if(landscape)
         {
-            cardTop = stripTop+fencer+2*MARGIN+bounds.height();
+            cardTop = stripTop+fencerSize+2*MARGIN+bounds.height();
             cardHeight = (height-cardTop-2*MARGIN_CARD-2*MARGIN-4*MARGIN_SHADOW)/2;
             cardWidth  = cardHeight*1000/1400;
             cardStep = cardWidth+MARGIN_CARD;
@@ -411,7 +423,7 @@ public class StripView extends View implements GameListener
         {
             cardWidth  = (width-6*MARGIN_CARD)/5;
             cardHeight = cardWidth*1400/1000;
-            cardTop = stripTop+fencer+4*MARGIN+bounds.height();
+            cardTop = stripTop+fencerSize+4*MARGIN+bounds.height();
             cardStep = cardWidth+MARGIN_CARD;
             cardLeft = (width-4*cardStep-cardWidth)/2;
             cardBottom = cardHeight+cardTop;
