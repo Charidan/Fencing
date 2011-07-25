@@ -80,8 +80,8 @@ public class Fencing extends Activity
         registerCommand('c', new RejectedCommand());
         registerCommand('C', new WithdrawnCommand());
         registerCommand('K', new KillCommand());
-        registerCommand('b', new NewGameCommand(Game.COLOR_BLACK));
-        registerCommand('w', new NewGameCommand(Game.COLOR_WHITE));
+        registerCommand('b', new NewGameCommand(Game.COLOR_PURPLE));
+        registerCommand('w', new NewGameCommand(Game.COLOR_GREEN));
         registerCommand('h', new SetHandCommand());
         registerCommand('x', new PositionCommand());
         registerCommand('t', new TurnCommand());
@@ -90,8 +90,8 @@ public class Fencing extends Activity
         registerCommand('m', new MoveNotice());
         registerCommand('r', new RetreatNotice());
         registerCommand('f', new FinalParryNotice());
-        registerCommand('A', new EndGameNotice(Game.COLOR_WHITE));
-        registerCommand('B', new EndGameNotice(Game.COLOR_BLACK));
+        registerCommand('A', new EndGameNotice(Game.COLOR_GREEN));
+        registerCommand('B', new EndGameNotice(Game.COLOR_PURPLE));
         registerCommand('B', new EndGameNotice(Game.COLOR_NONE));
         singleton = this;
     }
@@ -148,7 +148,7 @@ public class Fencing extends Activity
     {
         stripModel.setHeader("");
         stripModel.setFooter("");
-        stripView.startGame(Game.COLOR_WHITE, "FakeOpponent");
+        stripView.startGame(Game.COLOR_GREEN, "FakeOpponent");
         stripView.setHand("35313");
         stripModel.setState(StripModel.STATE_GAME);
     }

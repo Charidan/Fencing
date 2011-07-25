@@ -27,7 +27,7 @@ public class StripView extends View implements GameListener
     public StripModel model = null;
     
     private boolean landscape = false;
-    Paint textPaint,linePaint,whitePaint,blackPaint,cardPaint;
+    Paint textPaint,linePaint,greenPaint,purpPaint,cardPaint;
     
     public StripView(Context context)
     {
@@ -55,15 +55,15 @@ public class StripView extends View implements GameListener
         linePaint.setStrokeWidth(STRIP_THICK);
         linePaint.setStyle(Style.STROKE);
         
-        whitePaint = new Paint();
-        whitePaint.setColor(Color.WHITE);
-        whitePaint.setAntiAlias(true);
-        whitePaint.setStyle(Style.FILL_AND_STROKE);
+        greenPaint = new Paint();
+        greenPaint.setColor(Color.GREEN);
+        greenPaint.setAntiAlias(true);
+        greenPaint.setStyle(Style.FILL_AND_STROKE);
         
-        blackPaint = new Paint();
-        blackPaint.setColor(Color.BLACK);
-        blackPaint.setAntiAlias(true);
-        blackPaint.setStyle(Style.FILL_AND_STROKE);
+        purpPaint = new Paint();
+        purpPaint.setColor(Color.MAGENTA);
+        purpPaint.setAntiAlias(true);
+        purpPaint.setStyle(Style.FILL_AND_STROKE);
         
         cardPaint = new Paint();
         cardPaint.setColor(Color.GRAY);
@@ -158,16 +158,16 @@ public class StripView extends View implements GameListener
         // if it's not your turn
         switch(turn)
         {
-            case Game.TURN_BLACK_MOVE: 
-            case Game.TURN_BLACK_PARRY:
-            case Game.TURN_BLACK_PARRY_OR_RETREAT:
-                if(model.getColor() == Game.COLOR_WHITE) { model.setHeader("Please wait your turn"); return; }
+            case Game.TURN_PURPLE_MOVE: 
+            case Game.TURN_PURPLE_PARRY:
+            case Game.TURN_PURPLE_PARRY_OR_RETREAT:
+                if(model.getColor() == Game.COLOR_GREEN) { model.setHeader("Please wait your turn"); return; }
             break;
             
-            case Game.TURN_WHITE_MOVE:
-            case Game.TURN_WHITE_PARRY:
-            case Game.TURN_WHITE_PARRY_OR_RETREAT:
-                if(model.getColor() == Game.COLOR_BLACK) { model.setHeader("Please wait your turn"); return; }
+            case Game.TURN_GREEN_MOVE:
+            case Game.TURN_GREEN_PARRY:
+            case Game.TURN_GREEN_PARRY_OR_RETREAT:
+                if(model.getColor() == Game.COLOR_PURPLE) { model.setHeader("Please wait your turn"); return; }
             break;
         }
         
@@ -177,7 +177,7 @@ public class StripView extends View implements GameListener
         String attackCount = ""+model.getAttackList().size();
         
         // this is a useless comment
-        if(turn == Game.TURN_WHITE_MOVE || turn == Game.TURN_BLACK_MOVE)
+        if(turn == Game.TURN_GREEN_MOVE || turn == Game.TURN_PURPLE_MOVE)
         {
             //advance options
             if(!advanceValue.equals("*"))
@@ -210,7 +210,7 @@ public class StripView extends View implements GameListener
             }
         }
         
-        if(turn == Game.TURN_WHITE_PARRY || turn == Game.TURN_BLACK_PARRY)
+        if(turn == Game.TURN_GREEN_PARRY || turn == Game.TURN_PURPLE_PARRY)
         {
             // parry attack
             if (model.getAttackList().size() == model.getParryCount() && 
@@ -232,7 +232,7 @@ public class StripView extends View implements GameListener
             }
         }
         
-        if(turn == Game.TURN_WHITE_PARRY_OR_RETREAT || turn == Game.TURN_BLACK_PARRY_OR_RETREAT)
+        if(turn == Game.TURN_GREEN_PARRY_OR_RETREAT || turn == Game.TURN_PURPLE_PARRY_OR_RETREAT)
         {
             if(!retreatValue.equals("*"))
             {   
@@ -340,8 +340,8 @@ public class StripView extends View implements GameListener
         
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
-        int step = (width-2*MARGIN)/23*FENCER_SMALL/FENCER_BIG;
-        int startX = (width+1-step*23)/2;
+        float step = landscape ? (width-2*MARGIN)/23*FENCER_SMALL/FENCER_BIG : (width-2*MARGIN)/23;
+        float startX = (width+1-step*23)/2;
         Rect bounds = new Rect();
         float textOffsetX, textOffsetY;
         
@@ -356,21 +356,21 @@ public class StripView extends View implements GameListener
             return;
         }
         
-        String whiteName,blackName;
-        if(model.getColor() == Game.COLOR_BLACK)
+        String greenName,purpName;
+        if(model.getColor() == Game.COLOR_PURPLE)
         {
-            whiteName = model.getOppName();
-            blackName = model.getMyName();
+            greenName = model.getOppName();
+            purpName = model.getMyName();
         } else
         {
-            whiteName = model.getMyName();
-            blackName = model.getOppName();
+            greenName = model.getMyName();
+            purpName = model.getOppName();
         }
         
-        textPaint.getTextBounds(whiteName, 0, whiteName.length(), bounds);
-        g.drawText(whiteName, startX, bounds.height()+MARGIN, textPaint);
-        textPaint.getTextBounds(blackName, 0, blackName.length(), bounds);
-        g.drawText(blackName, width-startX-bounds.width(), bounds.height()+MARGIN, textPaint);
+        textPaint.getTextBounds(greenName, 0, greenName.length(), bounds);
+        g.drawText(greenName, startX, bounds.height()+MARGIN, textPaint);
+        textPaint.getTextBounds(purpName, 0, purpName.length(), bounds);
+        g.drawText(purpName, width-startX-bounds.width(), bounds.height()+MARGIN, textPaint);
         
         int fencerSize = landscape ? FENCER_BIG : FENCER_BIG;
         Bitmap fencerGreen, fencerPurple;
@@ -387,23 +387,23 @@ public class StripView extends View implements GameListener
         
         //TODO RFE use a selector to remove the chance of accidental change to position
         int stripTop = 2*MARGIN+bounds.height()+fencerSize;
-        int whiteX = startX+(model.getGame().whitepos-1)*step;
-        int blackX = startX+(model.getGame().blackpos-1)*step;            
+        float greenX = startX+(model.getGame().greenpos-1)*step;
+        float purpX = startX+(model.getGame().purppos-1)*step;            
         
         //draw the strip
         g.drawLine(startX, stripTop+fencerSize, startX+23*step, stripTop+fencerSize, linePaint);
         //draw the fencers
-        g.drawBitmap(fencerGreen, whiteX, stripTop, linePaint);
-        g.drawBitmap(fencerPurple, blackX, stripTop, linePaint);
+        g.drawBitmap(fencerGreen, greenX, stripTop, linePaint);
+        g.drawBitmap(fencerPurple, purpX, stripTop, linePaint);
         
         //draw position numbers
         int posTop = stripTop+fencerSize+MARGIN;
-        String whitepos = ""+model.getGame().getWhitepos();
-        String blackpos = ""+model.getGame().getBlackpos();
-        textPaint.getTextBounds(whitepos, 0, whitepos.length(), bounds);
-        g.drawText(whitepos, whiteX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
-        textPaint.getTextBounds(blackpos, 0, blackpos.length(), bounds);
-        g.drawText(blackpos, blackX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        String greenpos = ""+model.getGame().getGreenpos();
+        String purppos = ""+model.getGame().getPurppos();
+        textPaint.getTextBounds(greenpos, 0, greenpos.length(), bounds);
+        g.drawText(greenpos, greenX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
+        textPaint.getTextBounds(purppos, 0, purppos.length(), bounds);
+        g.drawText(purppos, purpX+(fencerSize-bounds.width()-1)/2, posTop+bounds.height(), textPaint);
         
         //draw buttons and cards
         float cardWidth,cardHeight,cardTop,cardBottom,cardLeft,cardStep;
@@ -621,7 +621,7 @@ public class StripView extends View implements GameListener
     public final void setMyColor(int color)   
     { 
         model.setColor(color); 
-        if(model.getColor() == Game.COLOR_WHITE) { model.slots = leftSlots; model.pics = leftPics; }
+        if(model.getColor() == Game.COLOR_GREEN) { model.slots = leftSlots; model.pics = leftPics; }
         else { model.slots = rightSlots; model.pics = rightPics; }
     }
 

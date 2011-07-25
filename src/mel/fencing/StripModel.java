@@ -254,7 +254,7 @@ public class StripModel
     
     public void displayLastAction()
     {
-        String actor = (getLastActor() == Game.COLOR_BLACK) ? "Black" : "White";
+        String actor = (getLastActor() == Game.COLOR_PURPLE) ? "Purple" : "Green";
         switch(lastAction)
         {
             case ACTION_MOVE:
@@ -279,23 +279,23 @@ public class StripModel
     {
         switch(game.getTurn())
         {
-            case Game.TURN_BLACK_MOVE:
-                setFooter("Black's turn to move");
+            case Game.TURN_PURPLE_MOVE:
+                setFooter("Purple's turn to move");
             break;
-            case Game.TURN_BLACK_PARRY:
-                setFooter("Black must parry");
+            case Game.TURN_PURPLE_PARRY:
+                setFooter("Purple must parry");
             break;
-            case Game.TURN_BLACK_PARRY_OR_RETREAT:
-                setFooter("Black must parry or retreat");
+            case Game.TURN_PURPLE_PARRY_OR_RETREAT:
+                setFooter("Purple must parry or retreat");
             break;
-            case Game.TURN_WHITE_MOVE:
-                setFooter("White's turn to move");
+            case Game.TURN_GREEN_MOVE:
+                setFooter("Green's turn to move");
             break;
-            case Game.TURN_WHITE_PARRY:
-                setFooter("White must parry");
+            case Game.TURN_GREEN_PARRY:
+                setFooter("Green must parry");
             break;
-            case Game.TURN_WHITE_PARRY_OR_RETREAT:
-                setFooter("White must parry or retreat");
+            case Game.TURN_GREEN_PARRY_OR_RETREAT:
+                setFooter("Green must parry or retreat");
             break;
             case Game.TURN_GAME_OVER:
                 setFooter(getGameOverClause());
@@ -345,8 +345,8 @@ public class StripModel
             return "The game ended in a tie";
         }
         
-        String win = (victor == Game.COLOR_BLACK) ? "Black" : "White";
-        String lose = (victor == Game.COLOR_BLACK) ? "white" : "black";
+        String win = (victor == Game.COLOR_PURPLE) ? "Purple" : "Green";
+        String lose = (victor == Game.COLOR_PURPLE) ? "green" : "purple";
         
         String reason = "";
         switch(endCause)
@@ -358,7 +358,7 @@ public class StripModel
                 reason = win+" wins because "+lose+" could not parry";
             break;
             case '2':
-                reason = win+" wins with more "+(game.blackpos-game.whitepos)+"s";
+                reason = win+" wins with more "+(game.purppos-game.greenpos)+"s";
             break;
             case '3':
                 reason = win+" wins with the better final position";
@@ -378,16 +378,16 @@ public class StripModel
     {
         switch(game.getTurn())
         {
-            case Game.TURN_BLACK_PARRY:
-            case Game.TURN_BLACK_PARRY_OR_RETREAT:
-                return Game.COLOR_WHITE;
-            case Game.TURN_BLACK_MOVE:
-                return (lastAction == ACTION_PARRY) ? Game.COLOR_BLACK : Game.COLOR_WHITE;
-            case Game.TURN_WHITE_PARRY:
-            case Game.TURN_WHITE_PARRY_OR_RETREAT:
-                return Game.COLOR_BLACK;
-            case Game.TURN_WHITE_MOVE:
-                return (lastAction == ACTION_PARRY) ? Game.COLOR_WHITE : Game.COLOR_BLACK;
+            case Game.TURN_PURPLE_PARRY:
+            case Game.TURN_PURPLE_PARRY_OR_RETREAT:
+                return Game.COLOR_GREEN;
+            case Game.TURN_PURPLE_MOVE:
+                return (lastAction == ACTION_PARRY) ? Game.COLOR_PURPLE : Game.COLOR_GREEN;
+            case Game.TURN_GREEN_PARRY:
+            case Game.TURN_GREEN_PARRY_OR_RETREAT:
+                return Game.COLOR_PURPLE;
+            case Game.TURN_GREEN_MOVE:
+                return (lastAction == ACTION_PARRY) ? Game.COLOR_GREEN : Game.COLOR_PURPLE;
         }
         return Game.COLOR_NONE;
     }
