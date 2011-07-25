@@ -63,7 +63,7 @@ public class Fencing extends Activity
     private static boolean loggedIn = false;
     private static boolean tryingLogin = false;
     private static boolean killed = false;
-    private static boolean debug = false;
+    private static boolean debug = true;
     
     static StripModel stripModel = new StripModel();
     

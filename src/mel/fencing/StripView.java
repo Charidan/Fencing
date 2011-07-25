@@ -58,11 +58,13 @@ public class StripView extends View implements GameListener
         greenPaint = new Paint();
         greenPaint.setColor(Color.GREEN);
         greenPaint.setAntiAlias(true);
+        greenPaint.setTextSize(20);
         greenPaint.setStyle(Style.FILL_AND_STROKE);
         
         purpPaint = new Paint();
         purpPaint.setColor(Color.MAGENTA);
         purpPaint.setAntiAlias(true);
+        purpPaint.setTextSize(20);
         purpPaint.setStyle(Style.FILL_AND_STROKE);
         
         cardPaint = new Paint();
@@ -367,10 +369,10 @@ public class StripView extends View implements GameListener
             purpName = model.getOppName();
         }
         
-        textPaint.getTextBounds(greenName, 0, greenName.length(), bounds);
-        g.drawText(greenName, startX, bounds.height()+MARGIN, textPaint);
-        textPaint.getTextBounds(purpName, 0, purpName.length(), bounds);
-        g.drawText(purpName, width-startX-bounds.width(), bounds.height()+MARGIN, textPaint);
+        greenPaint.getTextBounds(greenName, 0, greenName.length(), bounds);
+        g.drawText(greenName, startX, bounds.height()+MARGIN, greenPaint);
+        purpPaint.getTextBounds(purpName, 0, purpName.length(), bounds);
+        g.drawText(purpName, width-startX-bounds.width(), bounds.height()+MARGIN, purpPaint);
         
         int fencerSize = landscape ? FENCER_BIG : FENCER_BIG;
         Bitmap fencerGreen, fencerPurple;
@@ -391,7 +393,7 @@ public class StripView extends View implements GameListener
         float purpX = startX+(model.getGame().purppos-1)*step;            
         
         //draw the strip
-        g.drawLine(startX, stripTop+fencerSize, startX+23*step, stripTop+fencerSize, linePaint);
+        g.drawLine(startX, stripTop+fencerSize, startX+(float) 23.7*step, stripTop+fencerSize, linePaint);
         //draw the fencers
         g.drawBitmap(fencerGreen, greenX, stripTop, linePaint);
         g.drawBitmap(fencerPurple, purpX, stripTop, linePaint);
@@ -417,7 +419,7 @@ public class StripView extends View implements GameListener
             cardHeight = (height-cardTop-2*MARGIN_CARD-2*MARGIN-4*MARGIN_SHADOW)/2;
             cardWidth  = cardHeight*1000/1400;
             cardStep = cardWidth+MARGIN_CARD;
-            cardLeft = (width-6*cardStep-cardWidth)/2;
+            cardLeft = (width-(float) 6.4*cardStep-cardWidth)/2;
             cardBottom = cardHeight+cardTop;
         } else
         {
