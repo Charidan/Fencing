@@ -24,6 +24,8 @@ import android.widget.TextView;
 
 public class Fencing extends Activity
 {
+    public static final String VERSION = "0.1.2";
+    
     public static final int PORT = 9738;
 
     public static final int DIALOG_CONNECT = 0;
@@ -248,7 +250,7 @@ public class Fencing extends Activity
     
     public void showHelp()
     {
-        stripModel.setHeader("v0.1.1 by Mel and Richard Nicholson");
+        stripModel.setHeader(VERSION+" by Mel and Richard Nicholson");
         stripModel.setFooter("Illustrated by Moira Nicholson");
     }
     
