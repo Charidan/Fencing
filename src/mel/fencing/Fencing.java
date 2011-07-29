@@ -568,7 +568,7 @@ public class Fencing extends Activity
                     Command c = opcode2Command.get(s.charAt(0));
                     if(c == null)
                     {
-                        stripModel.setHeader("Unknown Sever Command");
+                        stripModel.setHeader("Unknown Server Command");
                         stripModel.setFooter(s);
                     }
                     else c.execute(s.substring(1));
