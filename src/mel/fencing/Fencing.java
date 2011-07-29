@@ -247,7 +247,8 @@ public class Fencing extends Activity
     
     public void showHelp()
     {
-        stripModel.setFooter("If you have to ask, you don't already know");
+        stripModel.setHeader("v0.1 by Mel and Richard Nicholson");
+        stripModel.setFooter("Illustrated by Moira Nicholson");
     }
     
     synchronized private void disconnect()
