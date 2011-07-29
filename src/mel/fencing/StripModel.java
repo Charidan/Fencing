@@ -374,6 +374,9 @@ public class StripModel
     public int getDistance() { return distance; }
     public int getLastAction() { return lastAction; }
     
+    private int endGameLastActor = Game.COLOR_NONE;
+    public void setEndGameLastActor(int lastActor) { endGameLastActor = lastActor; }
+    
     public int getLastActor()
     {
         switch(game.getTurn())
@@ -388,6 +391,8 @@ public class StripModel
                 return Game.COLOR_PURPLE;
             case Game.TURN_GREEN_MOVE:
                 return (lastAction == ACTION_PARRY) ? Game.COLOR_GREEN : Game.COLOR_PURPLE;
+            case Game.TURN_GAME_OVER:
+                return endGameLastActor;
         }
         return Game.COLOR_NONE;
     }
