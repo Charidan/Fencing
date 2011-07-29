@@ -218,12 +218,18 @@ public class StripModel
     public static final int ACTION_PAT = 2;
     public static final int ACTION_PARRY = 3;
     public static final int ACTION_RETREAT = 4;
+    public static final int ACTION_DISCONNECT = 5;
     
     private int parryValue = -1;
     private int parryCount = -1;
     private boolean mayRetreat = false;
     private int distance = -1;
     private int lastAction = ACTION_NONE;
+    
+    public void setDisconnect()
+    {
+        lastAction = ACTION_DISCONNECT;
+    }
     
     public void setParryDone()
     {
@@ -271,6 +277,9 @@ public class StripModel
             break;
             case ACTION_PAT:
                 setHeader(actor+" jumped "+distance+" and attacked with "+attackStr());
+            break;
+            case ACTION_DISCONNECT:
+                setHeader("The game has been cancelled");
             break;
         }
     }
@@ -362,6 +371,9 @@ public class StripModel
             break;
             case '3':
                 reason = win+" wins with the better final position";
+            break;
+            case 'L':
+                reason = "Your opponent has lost connection";
             break;
         }
         

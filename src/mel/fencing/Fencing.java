@@ -93,6 +93,7 @@ public class Fencing extends Activity
         registerCommand('A', new EndGameNotice(Game.COLOR_GREEN));
         registerCommand('B', new EndGameNotice(Game.COLOR_PURPLE));
         registerCommand('X', new EndGameNotice(Game.COLOR_NONE));
+        registerCommand('L', new LostConnectionNotice());
         singleton = this;
     }
     
@@ -247,7 +248,7 @@ public class Fencing extends Activity
     
     public void showHelp()
     {
-        stripModel.setHeader("v0.1 by Mel and Richard Nicholson");
+        stripModel.setHeader("v0.1.1 by Mel and Richard Nicholson");
         stripModel.setFooter("Illustrated by Moira Nicholson");
     }
     
@@ -741,6 +742,17 @@ public class Fencing extends Activity
             stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
             stripModel.setVictor(victor);
             stripModel.setEndCause(in.charAt(0));
+        }
+    }
+    
+    private class LostConnectionNotice implements Command
+    {        
+        @Override
+        public void execute(String in)
+        {
+            stripModel.setDisconnect();
+            stripModel.setEndCause('L');
+            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
         }
     }
     
