@@ -92,7 +92,7 @@ public class Fencing extends Activity
         registerCommand('f', new FinalParryNotice());
         registerCommand('A', new EndGameNotice(Game.COLOR_GREEN));
         registerCommand('B', new EndGameNotice(Game.COLOR_PURPLE));
-        registerCommand('B', new EndGameNotice(Game.COLOR_NONE));
+        registerCommand('X', new EndGameNotice(Game.COLOR_NONE));
         singleton = this;
     }
     
