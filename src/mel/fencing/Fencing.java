@@ -738,10 +738,10 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
-            stripModel.setEndGameLastActor(stripModel.getLastActor());
-            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
             stripModel.setVictor(victor);
             stripModel.setEndCause(in.charAt(0));
+            stripModel.setEndGameLastActor(stripModel.getLastActor());
+            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
         }
     }
     
