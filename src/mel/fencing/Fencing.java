@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 public class Fencing extends Activity
 {
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.1.3";
     
     public static final int PORT = 9738;
 
