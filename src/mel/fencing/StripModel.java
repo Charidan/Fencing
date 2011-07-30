@@ -2,6 +2,7 @@ package mel.fencing;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.graphics.Color;
 import android.widget.TextView;
 
 public class StripModel
@@ -165,6 +166,7 @@ public class StripModel
     TextView footer;
     private String headerString = "";
     private String footerString = "";
+    private int footerColor = Game.COLOR_NONE;
     
     public void setHeader(String in)
     {
@@ -174,8 +176,29 @@ public class StripModel
     
     public void setFooter(String in)
     {
+        setFooter(in, Game.COLOR_NONE);
+    }
+    
+    public void setFooter(String in, int textColor)
+    {
         footerString = in;
         footer.setText(in);
+        footerColor = textColor;
+        footer.setTextColor(colorOf(textColor));
+    }
+    
+    public int colorOf(int color)
+    {
+        switch(color)
+        {
+            case Game.COLOR_NONE:
+                return Color.WHITE;
+            case Game.COLOR_GREEN:
+                return Color.GREEN;
+            case Game.COLOR_PURPLE:
+                return Color.MAGENTA;
+            default: return Color.WHITE;
+        }
     }
     
     public void refreshText()
@@ -289,25 +312,25 @@ public class StripModel
         switch(game.getTurn())
         {
             case Game.TURN_PURPLE_MOVE:
-                setFooter("Purple's turn to move");
+                setFooter("Purple's turn to move", Game.COLOR_PURPLE);
             break;
             case Game.TURN_PURPLE_PARRY:
-                setFooter("Purple must parry");
+                setFooter("Purple must parry", Game.COLOR_PURPLE);
             break;
             case Game.TURN_PURPLE_PARRY_OR_RETREAT:
-                setFooter("Purple must parry or retreat");
+                setFooter("Purple must parry or retreat", Game.COLOR_PURPLE);
             break;
             case Game.TURN_GREEN_MOVE:
-                setFooter("Green's turn to move");
+                setFooter("Green's turn to move", Game.COLOR_GREEN);
             break;
             case Game.TURN_GREEN_PARRY:
-                setFooter("Green must parry");
+                setFooter("Green must parry", Game.COLOR_GREEN);
             break;
             case Game.TURN_GREEN_PARRY_OR_RETREAT:
-                setFooter("Green must parry or retreat");
+                setFooter("Green must parry or retreat", Game.COLOR_GREEN);
             break;
             case Game.TURN_GAME_OVER:
-                setFooter(getGameOverClause());
+                setFooter(getGameOverClause(), Game.COLOR_NONE);
             break;
         }
     }
