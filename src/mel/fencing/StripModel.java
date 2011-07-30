@@ -2,6 +2,7 @@ package mel.fencing;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.widget.TextView;
 
@@ -93,7 +94,7 @@ public class StripModel
     private Card advanceCard = null;
     private List<Card> attackList = new ArrayList<Card>();
     int slots[];
-    String pics[];
+    Bitmap pics[];
     
     public Card getRetreatCard()        { return retreatCard; }
     public Card getAdvanceCard()          { return advanceCard; }

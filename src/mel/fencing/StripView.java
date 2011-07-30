@@ -494,6 +494,12 @@ public class StripView extends View implements GameListener
             actionStep = actionWidth+MARGIN_CARD;
         }
         
+        for(int i=0; i<3; i++)
+        {
+            float actionX = actionLeft+actionStep*i;
+            renderActionHolder(g, i, actionX, actionTop, actionX+actionWidth, actionBottom); 
+        }
+        
       //save screen position in case of a touch event
         model.setCardWidth(cardWidth);
         model.setCardHeight(cardHeight);
@@ -515,12 +521,6 @@ public class StripView extends View implements GameListener
         model.setActionWidth(actionWidth);
         model.setActionStep(actionStep);
         
-        for(int i=0; i<3; i++)
-        {
-            float actionX = actionLeft+actionStep*i;
-            renderActionHolder(g, i, actionX, actionTop, actionX+actionWidth, actionBottom); 
-        }
-        
         if(model.isDragging()) 
         {
             // TODO consider a new paint for the dragging rectangle
@@ -538,14 +538,16 @@ public class StripView extends View implements GameListener
     public static final int SLOT_RETREAT = 0;
     public static final int SLOT_ADVANCE = 1;
     public static final int SLOT_ATTACK = 2;
-    // TODO replace these with pictures
-    public static final String PIC_LEFT = "<==";
-    public static final String PIC_RIGHT = "==>";
-    public static final String PIC_ATTACK = "+";
-    public static final int leftSlots[] = { SLOT_RETREAT, SLOT_ADVANCE, SLOT_ATTACK };
-    public static final String leftPics[] = { PIC_LEFT, PIC_RIGHT, PIC_ATTACK };
-    public static final int rightSlots[] = { SLOT_ATTACK, SLOT_ADVANCE, SLOT_RETREAT };
-    public static final String rightPics[] = { PIC_ATTACK, PIC_LEFT, PIC_RIGHT };
+    public final Bitmap PIC_PURPLE_LEFT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowleftpurp72);
+    public final Bitmap PIC_PURPLE_RIGHT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowrightpurp72);
+    public final Bitmap PIC_PURPLE_ATTACK = BitmapFactory.decodeResource(getResources(), R.drawable.arrowattpurp72);
+    public final Bitmap PIC_GREEN_LEFT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowleftgrn72);
+    public final Bitmap PIC_GREEN_RIGHT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowrightgrn72);
+    public final Bitmap PIC_GREEN_ATTACK = BitmapFactory.decodeResource(getResources(), R.drawable.arrowattgrn72);
+    public static final int greenSlots[] = { SLOT_RETREAT, SLOT_ADVANCE, SLOT_ATTACK };
+    public final Bitmap greenPics[] = { PIC_GREEN_LEFT, PIC_GREEN_RIGHT, PIC_GREEN_ATTACK };
+    public static final int purpleSlots[] = { SLOT_ATTACK, SLOT_ADVANCE, SLOT_RETREAT };
+    public final Bitmap purplePics[] = { PIC_PURPLE_ATTACK, PIC_PURPLE_LEFT, PIC_PURPLE_RIGHT };
     
     private void renderActionHolder(Canvas g, int slot, float left, float top, float right, float bottom)
     {
@@ -557,10 +559,9 @@ public class StripView extends View implements GameListener
         if(model.isSlotEmpty(slot))
         {
             //if the slot is empty, draw the slot picture
-            cardPaint.getTextBounds(model.pics[slot], 0, model.pics[slot].length(), bounds);
-            textOffsetY = (bottom-top-bounds.height())/2;
-            textOffsetX = (right-left-bounds.width())/2;
-            g.drawText(model.pics[slot], left+textOffsetX, top+textOffsetY+bounds.height(), cardPaint);
+            textOffsetY = (bottom-top-model.pics[slot].getHeight())/2;
+            textOffsetX = (right-left-model.pics[slot].getWidth())/2;
+            g.drawBitmap(model.pics[slot], left+textOffsetX, top+textOffsetY, linePaint);
         }
         else
         {
@@ -623,8 +624,8 @@ public class StripView extends View implements GameListener
     public final void setMyColor(int color)   
     { 
         model.setColor(color); 
-        if(model.getColor() == Game.COLOR_GREEN) { model.slots = leftSlots; model.pics = leftPics; }
-        else { model.slots = rightSlots; model.pics = rightPics; }
+        if(model.getColor() == Game.COLOR_GREEN) { model.slots = greenSlots; model.pics = greenPics; }
+        else { model.slots = purpleSlots; model.pics = purplePics; }
     }
 
     synchronized public void setHand(String in)
