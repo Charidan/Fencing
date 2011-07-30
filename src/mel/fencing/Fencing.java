@@ -649,6 +649,7 @@ public class Fencing extends Activity
         {
             stripModel.setHeader("");
             stripModel.setFooter("");
+            stripModel.setActionNewGame();
             stripView.startGame(color, in);
             if(waitDialog != null) waitDialog.dismiss();
             stripModel.setState(StripModel.STATE_GAME);
@@ -752,6 +753,7 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
+            if(stripModel.getGame().getTurn() == Game.TURN_GAME_OVER) return;
             stripModel.setDisconnect();
             stripModel.setEndCause('L');
             stripModel.getGame().setTurn(Game.TURN_GAME_OVER);

@@ -254,6 +254,11 @@ public class StripModel
         lastAction = ACTION_DISCONNECT;
     }
     
+    public void setActionNewGame()
+    {
+        lastAction = ACTION_NONE;
+    }
+    
     public void setParryDone()
     {
         lastAction = ACTION_PARRY;
