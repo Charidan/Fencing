@@ -395,7 +395,7 @@ public class StripModel
                 reason = win+" wins because "+lose+" could not parry";
             break;
             case '2':
-                reason = win+" wins with more "+(game.purppos-game.greenpos)+"s";
+                reason = win+" wins with more "+(game.purplePos-game.greenPos)+"s";
             break;
             case '3':
                 reason = win+" wins with the better final position";
@@ -431,6 +431,24 @@ public class StripModel
                 return Game.COLOR_PURPLE;
             case Game.TURN_GREEN_MOVE:
                 return (lastAction == ACTION_PARRY) ? Game.COLOR_GREEN : Game.COLOR_PURPLE;
+            case Game.TURN_GAME_OVER:
+                return endGameLastActor;
+        }
+        return Game.COLOR_NONE;
+    }
+    
+    public int getCurrentActor()
+    {
+        switch(game.getTurn())
+        {
+            case Game.TURN_PURPLE_PARRY:
+            case Game.TURN_PURPLE_PARRY_OR_RETREAT:
+            case Game.TURN_PURPLE_MOVE:
+                return Game.COLOR_PURPLE;
+            case Game.TURN_GREEN_PARRY:
+            case Game.TURN_GREEN_PARRY_OR_RETREAT:
+            case Game.TURN_GREEN_MOVE:
+                return Game.COLOR_GREEN;
             case Game.TURN_GAME_OVER:
                 return endGameLastActor;
         }

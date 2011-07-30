@@ -389,8 +389,8 @@ public class StripView extends View implements GameListener
         
         //TODO RFE use a selector to remove the chance of accidental change to position
         int stripTop = 2*MARGIN+bounds.height()+fencerSize;
-        float greenX = startX+(model.getGame().greenpos-1)*step;
-        float purpX = startX+(model.getGame().purppos-1)*step;            
+        float greenX = startX+(model.getGame().greenPos-1)*step;
+        float purpX = startX+(model.getGame().purplePos-1)*step;            
         
         //draw the strip
         g.drawLine(startX, stripTop+fencerSize, startX+(float) 23.7*step, stripTop+fencerSize, linePaint);
@@ -653,12 +653,20 @@ public class StripView extends View implements GameListener
         model.getGame().setPositions(in);
     }
     
+    public void setGameOver()
+    {
+        model.setEndGameLastActor(model.getCurrentActor());
+        model.getGame().setTurn(Game.TURN_GAME_OVER);
+    }
+    
     public void setTurn(String in)
     {
         resetModel();
         try
         {
-            model.getGame().setTurn(Integer.parseInt(in));
+            int turn = Integer.parseInt(in);
+            if(turn == Game.TURN_GAME_OVER) setGameOver();
+            else model.getGame().setTurn(turn);
         }
         catch(NumberFormatException e)
         {

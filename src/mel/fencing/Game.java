@@ -24,20 +24,20 @@ public class Game
     Hand hand = new Hand();
     int blackHP = 5;
     int whiteHP = 5;
-    int purppos = 23;
-    int greenpos = 1;
+    int purplePos = 23;
+    int greenPos = 1;
     int turn = TURN_GREEN_MOVE;
     
     public void reset()
     {
-        purppos = 23;
-        greenpos = 1;
+        purplePos = 23;
+        greenPos = 1;
         turn = TURN_GREEN_MOVE;
         fireGameChanged();
     }
     
-    public int getGreenpos() { return greenpos; }
-    public int getPurppos() { return purppos; }
+    public int getGreenpos() { return greenPos; }
+    public int getPurppos() { return purplePos; }
     public Hand getHand() { return hand; }
     public int getTurn() { return turn; }
 
@@ -59,8 +59,8 @@ public class Game
 
     public void setPositions(String in)
     {
-        greenpos = parsePos(in.charAt(0));
-        purppos = parsePos(in.charAt(1));
+        greenPos = parsePos(in.charAt(0));
+        purplePos = parsePos(in.charAt(1));
         fireGameChanged();
     }
     

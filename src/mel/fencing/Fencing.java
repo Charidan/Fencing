@@ -679,7 +679,6 @@ public class Fencing extends Activity
         @Override
         public void execute(String in)
         {
-            //TODO show the attack cards in the footer inside this methos (they will be in the model)
             stripView.setTurn(in);
         }
     }
@@ -743,8 +742,7 @@ public class Fencing extends Activity
         {
             stripModel.setVictor(victor);
             stripModel.setEndCause(in.charAt(0));
-            stripModel.setEndGameLastActor(stripModel.getLastActor());
-            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
+            stripView.setGameOver();
         }
     }
     
@@ -756,7 +754,7 @@ public class Fencing extends Activity
             if(stripModel.getGame().getTurn() == Game.TURN_GAME_OVER) return;
             stripModel.setDisconnect();
             stripModel.setEndCause('L');
-            stripModel.getGame().setTurn(Game.TURN_GAME_OVER);
+            stripView.setGameOver();
         }
     }
     
