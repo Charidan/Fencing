@@ -23,7 +23,7 @@ public class StripModel
     private float actionLeft, actionTop, actionBottom, actionWidth, actionStep;
     
     public final Game getGame()             { return game; }
-    public final int getColor()             { return color; }
+    public final int getMyColor()             { return color; }
     public final int getTurn()              { return game.getTurn(); }
     public final String getMyName()         { return myName; }
     public final String getOppName()        { return oppName; }

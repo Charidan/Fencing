@@ -163,13 +163,13 @@ public class StripView extends View implements GameListener
             case Game.TURN_PURPLE_MOVE: 
             case Game.TURN_PURPLE_PARRY:
             case Game.TURN_PURPLE_PARRY_OR_RETREAT:
-                if(model.getColor() == Game.COLOR_GREEN) { model.setHeader("Please wait your turn"); return; }
+                if(model.getMyColor() == Game.COLOR_GREEN) { model.setHeader("Please wait your turn"); return; }
             break;
             
             case Game.TURN_GREEN_MOVE:
             case Game.TURN_GREEN_PARRY:
             case Game.TURN_GREEN_PARRY_OR_RETREAT:
-                if(model.getColor() == Game.COLOR_PURPLE) { model.setHeader("Please wait your turn"); return; }
+                if(model.getMyColor() == Game.COLOR_PURPLE) { model.setHeader("Please wait your turn"); return; }
             break;
         }
         
@@ -359,7 +359,7 @@ public class StripView extends View implements GameListener
         }
         
         String greenName,purpName;
-        if(model.getColor() == Game.COLOR_PURPLE)
+        if(model.getMyColor() == Game.COLOR_PURPLE)
         {
             greenName = model.getOppName();
             purpName = model.getMyName();
@@ -544,6 +544,7 @@ public class StripView extends View implements GameListener
     public final Bitmap PIC_GREEN_LEFT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowleftgrn72);
     public final Bitmap PIC_GREEN_RIGHT = BitmapFactory.decodeResource(getResources(), R.drawable.arrowrightgrn72);
     public final Bitmap PIC_GREEN_ATTACK = BitmapFactory.decodeResource(getResources(), R.drawable.arrowattgrn72);
+    public final Bitmap PIC_PARRY = BitmapFactory.decodeResource(getResources(), R.drawable.arrowparry72);
     public static final int greenSlots[] = { SLOT_RETREAT, SLOT_ADVANCE, SLOT_ATTACK };
     public final Bitmap greenPics[] = { PIC_GREEN_LEFT, PIC_GREEN_RIGHT, PIC_GREEN_ATTACK };
     public static final int purpleSlots[] = { SLOT_ATTACK, SLOT_ADVANCE, SLOT_RETREAT };
@@ -559,9 +560,21 @@ public class StripView extends View implements GameListener
         if(model.isSlotEmpty(slot))
         {
             //if the slot is empty, draw the slot picture
-            textOffsetY = (bottom-top-model.pics[slot].getHeight())/2;
-            textOffsetX = (right-left-model.pics[slot].getWidth())/2;
-            g.drawBitmap(model.pics[slot], left+textOffsetX, top+textOffsetY, linePaint);
+            Bitmap pic = model.pics[slot];
+            if
+            (
+                model.slots[slot] == SLOT_ATTACK &&
+                (
+                    model.getTurn() == model.getMyColor()+Game.TURN_PARRY ||
+                    model.getTurn() == model.getMyColor()+Game.TURN_PARRY_OR_RETREAT
+                )
+            )
+            {
+                pic = PIC_PARRY;
+            }
+            textOffsetY = (bottom-top-pic.getHeight())/2;
+            textOffsetX = (right-left-pic.getWidth())/2;
+            g.drawBitmap(pic, left+textOffsetX, top+textOffsetY, linePaint);
         }
         else
         {
@@ -624,7 +637,7 @@ public class StripView extends View implements GameListener
     public final void setMyColor(int color)   
     { 
         model.setColor(color); 
-        if(model.getColor() == Game.COLOR_GREEN) { model.slots = greenSlots; model.pics = greenPics; }
+        if(model.getMyColor() == Game.COLOR_GREEN) { model.slots = greenSlots; model.pics = greenPics; }
         else { model.slots = purpleSlots; model.pics = purplePics; }
     }
 
