@@ -122,6 +122,8 @@ public class StripView extends View implements GameListener
     
     private void tryGrab(float x, float y)
     {
+        // if the game has ended, stop grabbing cards
+        if(model.getState() == StripModel.STATE_ENDGAME) return;
         // if (x,y) is over a card, start dragging it
         if(y<model.getCardTop() || y>model.getCardBottom() || x<model.getCardLeft() ) return;
         x -= model.getCardLeft();
